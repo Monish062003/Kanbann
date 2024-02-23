@@ -1,0 +1,308 @@
+*{
+    margin: 0px;
+    padding: 0px;
+}
+
+.side-container{
+    --totalmaxwidth:18vw;
+    --totalminwidth:3vw;
+    --totalheight:92vh;
+    border-right: 4px solid #F6F6F6;
+    background: rgba(47, 48, 52, 0.68);
+    width: var(--totalmaxwidth);
+    z-index: 6;
+    height: 92vh;
+}
+
+.nav-direction{
+    display: flex;
+    justify-content: end;
+    align-items: center;
+    width: auto;
+    height: 10vh;
+    border-bottom: 1px solid white;
+}
+
+.sidedirect-button{
+    width: 3vw;
+    height: 7vh;
+    margin-right: 1vw;
+    z-index: 5;
+    border: 0px none;
+    border-radius: 0.375rem;
+    background: rgba(187, 179, 179, 0.33);
+    border: 1px solid #70DAD4;
+}
+
+.sidedirect-button:hover{
+    background-color: rgba(96, 89, 89, 0.66);
+}
+
+
+@keyframes opaquetext {
+    from{
+        opacity: 1;
+    }
+    to{
+        opacity: 0;
+    }
+}
+
+@keyframes opaquetextinv {
+    from{
+        opacity: 0;
+    }
+    to{
+        opacity: 1;
+    }
+}
+
+@keyframes swipe {
+    from{
+        width: var(--totalmaxwidth);
+    }
+    to{
+        width: var(--totalminwidth);
+    }
+}
+
+@keyframes swipe-inverse {
+    from{
+        width: var(--totalminwidth);
+    }
+    to{
+        width: var(--totalmaxwidth);
+    }
+}
+
+@keyframes swipebutton {
+    from{
+        margin-right: 1vw;
+        border: 1px solid #70DAD4;
+        background: rgba(187, 179, 179, 0.33);
+    }
+    to{
+        margin-right: -1.5vw;
+        border: none;
+        background-color: #F6F6F6;
+    }
+}
+
+@keyframes swipebutton-inverse {
+    from{
+        margin-right: -1.5vw;
+        border: none;
+        background-color: #F6F6F6;
+    }
+    to{
+        margin-right: 1vw;
+        border: 1px solid #70DAD4;
+        background: rgba(187, 179, 179, 0.33);
+    }
+}
+
+.workspacehandler{
+    height: 76vh;
+    overflow-y: scroll;
+}
+
+.workspacehandler::-webkit-scrollbar{
+    width: 0.8rem;
+    height: 0.8rem;
+}
+
+.workspacehandler::-webkit-scrollbar-track{
+    background-color: rgba(47, 44, 44, 0);
+    border-radius: 20px;
+}
+
+.workspacehandler::-webkit-scrollbar-thumb{
+    background-color: rgb(130, 182, 195);
+    border-radius: 20px;
+    border:0.2rem solid transparent;
+    background-clip: content-box;
+}
+
+.workspacehandler::-webkit-scrollbar-thumb:hover{
+    background-color: antiquewhite;
+}
+
+.sidedirect-button-swipebutton{
+    animation: swipebutton 2s ease-in-out 0s 1 forwards ;
+}
+
+.side-container-swipe{
+    animation: swipe 2s ease-in-out 0s 1 forwards ;
+}
+
+.sidedirect-button-swipebuttoninv{
+    animation: swipebutton-inverse 2s ease-in-out 0s 1 forwards ;
+}
+
+.side-container-swipeinv{
+    animation: swipe-inverse 2s ease-in-out 0s 1 forwards ;
+}
+
+.sideopaquetext{
+    animation: opaquetext 2s ease-in-out 0s 1 forwards ;
+}
+
+.sideopaquetextinv{
+    animation: opaquetextinv 2s ease-in-out 0s 1 forwards ;
+}
+
+
+.sidedirect-button img{
+    transform: rotate(90deg);
+    width: 3vw;
+    height: 7vh;
+}
+
+.workspace-group{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: auto;
+    height: 6vh;
+    text-wrap:nowrap;
+    border-bottom: 1px solid white;
+    color: #FFF;
+    font-family: Roboto;
+    gap: 10px;
+    font-size: 1.375rem;
+    font-style: normal;
+    font-weight: 500;
+    line-height: normal;
+}
+
+.workspace-group:hover{
+    cursor: pointer;
+    background-color: rgba(146, 135, 131, 0.5);
+}
+
+.workspace-group button{
+    width: 1.5vw;
+    height: 1.375rem;
+    font-size: 1.75rem;
+    background-color: transparent;
+    border: 0px none;
+    color: white;
+    margin-bottom: 1.5vh;
+}
+
+.workspaceheading{
+    width: 12vw;
+    height: 4.5vh;
+    font-size: 1rem;
+    padding-left: 10px;
+}
+
+@media screen and (max-width:768px){
+    .side-container{
+        --totalmaxwidth:49vw;
+        --totalminwidth:9vw;
+    }
+
+    .workspace-group{
+        font-size: 1rem;
+    }
+
+    .workspace-group button{
+        font-size: 1.3rem;
+        margin-bottom: 0.5vw;
+    }
+
+    .workspaceheading{
+        font-size: 1rem;
+        width: 37vw;
+    }
+
+    .sidedirect-button{
+        width: 6vw;
+        height: 6vh;
+        margin-right: 2vw;
+    }
+
+    .sidedirect-button img{
+        width: 7vw;
+        height: 4vh;
+        position: relative;
+        right: 0.5vw;
+    }
+
+    @keyframes swipebutton {
+        from{
+            margin-right: 2vw;
+        }
+        to{
+            margin-right: -3.5vw;
+        }
+    }
+    
+    @keyframes swipebutton-inverse {
+        from{
+            margin-right: -3.5vw;
+        }
+        to{
+            margin-right: 2vw;
+        }
+    }
+}
+
+@media screen and (min-width:768px) and (max-width:1024px){
+
+    .nav-direction{
+        height: 8vh;
+    }
+
+    .workspace-group button{
+        font-size: 1.3rem;
+        margin-bottom: 0.5vw;
+    }
+
+    .workspaceheading{
+        font-size: 1rem;
+        width: 24vw;
+    }
+
+    .side-container{
+        --totalmaxwidth: 32vw;
+        --totalminwidth: 6vw;
+    }
+
+    .sidedirect-button{
+        width: 5vw;
+        height: 6vh;
+    }
+
+    .sidedirect-button img{
+        width: 6vw;
+        height: 4vh;
+        position: relative;
+        right: 0.5vw
+    }
+
+    @keyframes swipebutton {
+        from{
+            margin-right: 1vw;
+        }
+        to{
+            margin-right: -3vw;
+        }
+    }
+    
+    @keyframes swipebutton-inverse {
+        from{
+            margin-right: -3vw;
+        }
+        to{
+            margin-right: 1vw;
+        }
+    }
+}
+
+@media screen and (min-width:1024px) and (max-width:1440px){
+    .side-container{
+        --totalmaxwidth: 25vw;
+    }
+}

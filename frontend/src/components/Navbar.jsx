@@ -1,0 +1,63 @@
+import React,{useEffect, useState} from 'react'
+import  '../Css/navbar.css'
+import {auth,provider} from '../googleauth/login'
+import { signInWithPopup } from 'firebase/auth';
+
+function Navbar() {
+  const[btnname,setbtnname]=useState('Login with Google');
+  let refreshstopper = 0;
+  
+  useEffect(()=>{
+    if (refreshstopper==0) {
+      if (document.cookie.split("=")[1]!=undefined) {
+        setbtnname('Signout')
+      }
+    }
+    refreshstopper++;
+  },[])
+  
+  const Login=(()=>{
+    signInWithPopup(auth,provider).then(async(data)=>{
+      document.cookie = `${data.user.displayName}=${data.user.email}; expires=Fri, 31 Dec 9999 23:59:59 GMT; path=/`;
+      
+      let response = await fetch('/email',{
+        method:'POST',
+        headers:{
+          'Content-Type':'application/json'
+        },
+        body:JSON.stringify({
+          email:data.user.email,
+        })
+      });
+      
+      response = await response.json();
+      if (response != "") {
+        window.location.reload();
+      }
+    });
+  });
+  
+  const SignOut = () =>{
+    localStorage.clear();
+    document.cookie = document.cookie.split("=")[0] + '=; expires=Thu, 01 Jan 1970 00:00:01 GMT; path=/';
+    document.cookie = document.cookie.split("=")[0] + '=; expires=Thu, 01 Jan 1970 00:00:01 GMT; path=/';
+  }
+  
+  const Check = () =>{
+    if (btnname==='Login with Google') {
+      Login();
+      setbtnname('Signout');
+    } else {
+      SignOut();
+      setbtnname('Login with Google')
+      window.location.reload(true);
+    }
+  }
+  return (
+    <div className='nav'>
+      <div className="title">Kanban</div>
+      <button className='login' name='btn' onClick={Check}>{btnname}</button>
+    </div>
+  )
+}
+export default Navbar

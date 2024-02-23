@@ -1,0 +1,23 @@
+*{
+    margin: 0px;
+    padding: 0px;
+}
+
+.home{
+    display: flex;
+    background: rgb(16,51,45) url("../Images/beach.jpg") no-repeat fixed top; 
+    background-size:cover;
+    width: 100vw;
+    height: 92vh;
+}
+
+.sidesection{
+    width: 18vw;
+    height: 92vh;
+}
+
+.cardssection{
+    width: 82vw;
+    height: 92vh;
+}
+
