@@ -564,6 +564,10 @@ connectToDatabase().then(async() => {
         res.json(concatenatedArray)
     })
 
+    app.get("/loveit",(req,res)=>{
+        res.send("Say hi");
+    })
+
     app.listen(80, () => {
         console.log("Listen to: http://localhost:80");
     });
