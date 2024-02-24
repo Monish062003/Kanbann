@@ -8,7 +8,7 @@ export default function Card(props) {
     let cardsarray = [];
     let changestate= props.changestate;
     let carry=0;
-    let data = await fetch("https://serverhost-chi.vercel.app/readworkspace", {
+    let data = await fetch("/readworkspace", {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -41,7 +41,7 @@ export default function Card(props) {
       cardsarray.push(<Card name={data[index]} title={data[index+finalindex]} desc={data[index+2*finalindex]} tasks={data[index+3*finalindex]} beforetaskslength={carry} changestate={changestate} arrange={index} current_workspace={props.current_workspace}/>)
     }
     changestate([...cardsarray])      
-    fetch('https://serverhost-chi.vercel.app/card', {
+    fetch('/card', {
       method: 'POST',
       headers: {
           'Content-Type':'application/json'
@@ -78,7 +78,7 @@ export default function Card(props) {
     }, [props.tasks])
     
     let AddTask=(async()=>{
-      let tdata = await fetch("https://serverhost-chi.vercel.app/task",{
+      let tdata = await fetch("/task",{
         method:"POST",
         headers:{
           "Content-Type":"application/json"
@@ -111,7 +111,7 @@ export default function Card(props) {
           div.classList.add('cdesc');
           locate = 2;
         }
-        fetch('https://serverhost-chi.vercel.app/card',{
+        fetch('/card',{
           method:'POST',
           headers:{
             'Content-Type':'application/json'

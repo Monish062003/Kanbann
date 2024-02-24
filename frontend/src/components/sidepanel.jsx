@@ -69,7 +69,7 @@ function Sidepanel(props) {
     if (e.target.tagName=="BUTTON") {
       count--;
       let title=e.target.parentElement.children[0].innerHTML?e.target.parentElement.children[0].innerHTML:e.target.parentElement.children[0].name;
-      fetch('https://serverhost-chi.vercel.app/workspace',{
+      fetch('/workspace',{
         method:"POST",
         headers:{
           "Content-Type":"application/json"
@@ -108,7 +108,7 @@ function Sidepanel(props) {
         workspace_name.remove();         
         let workspace_newname=document.createElement('div');
 
-        fetch('https://serverhost-chi.vercel.app/workspace',{
+        fetch('/workspace',{
           method:"POST",
           headers:{
             "Content-Type":"application/json"
@@ -205,7 +205,7 @@ function Sidepanel(props) {
     workspacetab.appendChild(text);
     workspacetab.appendChild(button);
 
-    fetch('https://serverhost-chi.vercel.app/workspace',{
+    fetch('/workspace',{
       method:"POST",
       headers:{
         "Content-Type":"application/json"

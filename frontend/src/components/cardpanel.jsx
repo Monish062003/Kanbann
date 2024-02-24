@@ -22,7 +22,7 @@ function Cardpanel(props) {
     (async()=>{
       if (props.current_workspace!=null) {
         let cardsArray=[];
-        let getcardsinfo = await fetch("https://serverhost-chi.vercel.app/readworkspace", {
+        let getcardsinfo = await fetch("/readworkspace", {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
@@ -69,7 +69,7 @@ function Cardpanel(props) {
     setCount(count + 1);
     document.cookie=`count=${count} ; expires=Fri, 31 Dec 9999 23:59:59 GMT; path="/"`
     setCards([...cards,<Card name={`Card ${count}`} title={'Card Title'} desc={'Card Description'} tasks={['Task 1']} beforetaskslength={carry} arrange={cards.length} current_workspace={props.current_workspace} usingstate={cards} changestate={setCards}/>])
-    fetch('https://serverhost-chi.vercel.app/card',{
+    fetch('/card',{
       method:'POST',
       headers:{
         'Content-Type':'application/json'

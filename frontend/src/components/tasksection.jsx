@@ -27,7 +27,7 @@ export default function Tasksection(props) {
   let TaskButton=(async()=>{
     let changestate = props.changingstate;
     let count=localStorage.getItem('count');
-    let tdata = await fetch("https://serverhost-chi.vercel.app/task",{
+    let tdata = await fetch("/task",{
       method:"POST",
       headers:{
         "Content-Type":"application/json"
@@ -66,7 +66,7 @@ export default function Tasksection(props) {
       let [oldvalue,newvalue] = [inputvalue.current.placeholder,inputvalue.current.value];
       console.log(oldvalue,newvalue)
       inputvalue.current.placeholder=newvalue;
-      fetch("https://serverhost-chi.vercel.app/task",{
+      fetch("/task",{
         method:"POST",
         headers:{
           "Content-Type":"application/json"
