@@ -21,7 +21,7 @@ export default function Uploadbutton() {
       filread.onload=()=>{
         localStorage.setItem('text',filread.result)
       }
-      let response= await fetch('/read',{
+      let response= await fetch('https://serverhost-chi.vercel.app/read',{
         method:"POST",
         headers:{
           'Content-Type':'application/json'

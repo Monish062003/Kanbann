@@ -6,7 +6,7 @@ import Sidepanel from './sidepanel';
 
 async function fetchWorkspaceData() {
   if (document.cookie.split("=")[1]!=undefined) {
-    const response = await fetch("/email", {
+    const response = await fetch("https://serverhost-chi.vercel.app/email", {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -16,6 +16,8 @@ async function fetchWorkspaceData() {
       })
     });
     let data = await response.json();
+    console.log("About to start")
+    console.log(data)
     return data;
   }
   else{

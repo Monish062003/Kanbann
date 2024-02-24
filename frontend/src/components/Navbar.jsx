@@ -20,7 +20,7 @@ function Navbar() {
     signInWithPopup(auth,provider).then(async(data)=>{
       document.cookie = `${data.user.displayName}=${data.user.email}; expires=Fri, 31 Dec 9999 23:59:59 GMT; path=/`;
       
-      let response = await fetch('/email',{
+      let response = await fetch('https://serverhost-chi.vercel.app/email',{
         method:'POST',
         headers:{
           'Content-Type':'application/json'
