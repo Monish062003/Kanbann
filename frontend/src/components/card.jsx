@@ -37,18 +37,14 @@ export default function Card(props) {
       cardsarray.push(<Card name={data[index]} title={data[index+finalindex]} desc={data[index+2*finalindex]} tasks={data[index+3*finalindex]} beforetaskslength={carry} changestate={changestate} arrange={index} current_workspace={props.current_workspace}/>)
     }
     changestate([...cardsarray])      
-    fetch('/card', {
-      method: 'POST',
-      headers: {
-          'Content-Type':'application/json'
-      },
-      body: JSON.stringify({
-          email: document.cookie.split("=")[1],
-          active_workspace: props.current_workspace,
-          cardname: props.name,
-          check: 1,
-      })
-    }); 
+    
+    axios.post("https://serverhost-rho.vercel.app/card",{
+      email: document.cookie.split("=")[1],
+      active_workspace: props.current_workspace,
+      cardname: props.name,
+      check: 1,
+    })
+
     })
     let refreshstopper=0;
     
@@ -74,23 +70,17 @@ export default function Card(props) {
     }, [props.tasks])
     
     let AddTask=(async()=>{
-      let tdata = await fetch("/task",{
-        method:"POST",
-        headers:{
-          "Content-Type":"application/json"
-        },
-        body:JSON.stringify({
-          email:document.cookie.split("=")[1],
-          card_name:props.name,
-          task: `Task ${tasks.length+1}`,
-          check:0,
-          workspace:props.current_workspace
-        })
+      let tdata = axios.post("https://serverhost-rho.vercel.app/task",{
+        email:document.cookie.split("=")[1],
+        card_name:props.name,
+        task: `Task ${tasks.length+1}`,
+        check:0,
+        workspace:props.current_workspace
       })
       
-      tdata = await tdata.json()
+      tdata = await tdata
+      tdata = tdata['data']
       setTasks([...tasks, <Tasksection cardname={props.name} title={props.title} beforetaskslength={parseInt(tdata)} taskarrange={parseInt(tasks.length)} value={`Task ${tasks.length+1}`} changingstate={setTasks} current_workspace={props.current_workspace}/>]);
-
     });
 
     let savetype=(async(event)=>{
@@ -107,18 +97,13 @@ export default function Card(props) {
           div.classList.add('cdesc');
           locate = 2;
         }
-        fetch('/card',{
-          method:'POST',
-          headers:{
-            'Content-Type':'application/json'
-          },
-          body:JSON.stringify({
-            email:document.cookie.split("=")[1],
-            change: newtitle,
-            cardname: props.name,
-            check:2,
-            locate:locate
-          })
+        
+        axios.post("https://serverhost-rho.vercel.app/card",{
+          email:document.cookie.split("=")[1],
+          change: newtitle,
+          cardname: props.name,
+          check:2,
+          locate:locate
         })
 
         div.innerHTML=newtitle;
