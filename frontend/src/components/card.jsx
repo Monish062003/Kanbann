@@ -2,24 +2,20 @@ import React,{useState,useEffect} from 'react'
 import '../Css/card.css'
 import Delete from "../Images/delete.png";
 import Tasksection from '../components/tasksection'
+import axios from "axios"
 
 export default function Card(props) {
   let deletebtn = (async () => {
     let cardsarray = [];
     let changestate= props.changestate;
     let carry=0;
-    let data = await fetch("/readworkspace", {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        email: document.cookie.split("=")[1],
-        workspace:props.current_workspace,
-        check:1
-      })
-    });
-    data = await data.json();
+
+    let data = axios.post("https://serverhost-rho.vercel.app/readworkspace",{
+      email: document.cookie.split("=")[1],
+      workspace:props.current_workspace,
+      check:1
+    })
+    data = await data['data'];
     let finalindex= data.length/4;
     
     for (let index = 0; index < finalindex; index++) {

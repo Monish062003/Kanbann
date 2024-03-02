@@ -2,6 +2,7 @@ import React,{useEffect,useState,useRef} from 'react';
 import '../Css/card.css';
 import Card from './card';
 import Cookies from 'js-cookie';
+import axios from "axios"
 
 function Cardpanel(props) {
 
@@ -22,18 +23,14 @@ function Cardpanel(props) {
     (async()=>{
       if (props.current_workspace!=null) {
         let cardsArray=[];
-        let getcardsinfo = await fetch("/readworkspace", {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            email: document.cookie.split("=")[1],
-            workspace:props.current_workspace,
-            check:1
-          })
-        });
-        let newdata = await getcardsinfo.json();
+        let getcardsinfo = axios.post("https://serverhost-rho.vercel.app/readworkspace",{
+          "email": document.cookie.split("=")[1],
+          "workspace":props.current_workspace,
+          "check":1
+        })
+        let newdata = await getcardsinfo;
+        newdata = newdata['data']
+
         let finalindex= newdata.length/4;
         if (finalindex != undefined) {
           let [figure,carry] = [[0],0]
@@ -69,20 +66,14 @@ function Cardpanel(props) {
     setCount(count + 1);
     document.cookie=`count=${count} ; expires=Fri, 31 Dec 9999 23:59:59 GMT; path="/"`
     setCards([...cards,<Card name={`Card ${count}`} title={'Card Title'} desc={'Card Description'} tasks={['Task 1']} beforetaskslength={carry} arrange={cards.length} current_workspace={props.current_workspace} usingstate={cards} changestate={setCards}/>])
-    fetch('/card',{
-      method:'POST',
-      headers:{
-        'Content-Type':'application/json'
-      },
-      body:JSON.stringify({
-        email:document.cookie.split("=")[1],
-        active_workspace:props.current_workspace,
-        cardtitle: 'Card Title',
-        cardname: `Card ${count}`,
-        carddesc: 'Card Description',
-        check:0,
-        position: cards.length
-      })
+    axios.post("https://serverhost-rho.vercel.app/card",{
+      email:document.cookie.split("=")[1],
+      active_workspace:props.current_workspace,
+      cardtitle: 'Card Title',
+      cardname: `Card ${count}`,
+      carddesc: 'Card Description',
+      check:0,
+      position: cards.length
     })
   });
 

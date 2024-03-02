@@ -3,21 +3,16 @@ import '../Css/boardpage.css';
 import Navbar from './Navbar.jsx';
 import Cardspanel from './cardpanel';
 import Sidepanel from './sidepanel';
+import axios from "axios"
 
 async function fetchWorkspaceData() {
   if (document.cookie.split("=")[1]!=undefined) {
-    const response = await fetch("/email", {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        email: document.cookie.split("=")[1],
-      })
-    });
-    let data = await response.json();
-    console.log(data)
-    return data;
+    const response = axios.post("https://serverhost-rho.vercel.app/email",{
+      "email": `${document.cookie.split("=")[1]}`,
+    })
+
+    let data = await response;
+    return data['data'];
   }
   else{
     return null;

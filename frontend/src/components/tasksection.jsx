@@ -1,5 +1,6 @@
 import React,{useRef,useEffect, useState} from 'react'
 import '../Css/card.css'
+import axios from "axios"
 
 export default function Tasksection(props) {
 
@@ -27,19 +28,14 @@ export default function Tasksection(props) {
   let TaskButton=(async()=>{
     let changestate = props.changingstate;
     let count=localStorage.getItem('count');
-    let tdata = await fetch("/task",{
-      method:"POST",
-      headers:{
-        "Content-Type":"application/json"
-      },
-      body:JSON.stringify({
-        email:document.cookie.split("=")[1],
-        card_name:props.cardname,
-        workspace:props.current_workspace,
-        task:props.value,
-        check:1,
-      })
-    })
+
+    let tdata =  axios.post("https://serverhost-rho.vercel.app/task",{
+      email:document.cookie.split("=")[1],
+      card_name:props.cardname,
+      workspace:props.current_workspace,
+      task:props.value,
+      check:1,
+    }) 
 
     tdata = await tdata.json();
     for (let index = 0; index < tdata.length; index++) {
@@ -66,20 +62,15 @@ export default function Tasksection(props) {
       let [oldvalue,newvalue] = [inputvalue.current.placeholder,inputvalue.current.value];
       console.log(oldvalue,newvalue)
       inputvalue.current.placeholder=newvalue;
-      fetch("/task",{
-        method:"POST",
-        headers:{
-          "Content-Type":"application/json"
-        },
-        body:JSON.stringify({
-          email:document.cookie.split("=")[1],
-          card_name:props.cardname,
-          workspace:props.current_workspace,
-          task:oldvalue,
-          newvalue:newvalue,
-          check:2,
-        })
-      })
+      
+      let tdata =  axios.post("https://serverhost-rho.vercel.app/task",{
+        email:document.cookie.split("=")[1],
+        card_name:props.cardname,
+        workspace:props.current_workspace,
+        task:oldvalue,
+        newvalue:newvalue,
+        check:2,
+      }) 
     }
   }
 

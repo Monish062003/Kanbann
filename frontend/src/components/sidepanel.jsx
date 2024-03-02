@@ -1,6 +1,7 @@
 import React,{useEffect,useState} from 'react'
 import '../Css/sidepanel.css'
 import Sideswift from '../Images/downarrow.png'
+import axios from "axios"
 
 function Sidepanel(props) {
   let iterations=2
@@ -69,17 +70,13 @@ function Sidepanel(props) {
     if (e.target.tagName=="BUTTON") {
       count--;
       let title=e.target.parentElement.children[0].innerHTML?e.target.parentElement.children[0].innerHTML:e.target.parentElement.children[0].name;
-      fetch('/workspace',{
-        method:"POST",
-        headers:{
-          "Content-Type":"application/json"
-        },
-        body:JSON.stringify({
-          email:document.cookie.split("=")[1],
-          workspacename:title,
-          check:1,
-        })
-      });
+
+      axios.post("https://serverhost-rho.vercel.app/workspace",{
+        email:document.cookie.split("=")[1],
+        workspacename:title,
+        check:1,
+      })
+      
       let switchelem = e.target.parentElement.parentElement.children;
       for (let index = 0; index < switchelem.length; index++) {
         if (switchelem[index]==e.target.parentElement) {
@@ -108,18 +105,12 @@ function Sidepanel(props) {
         workspace_name.remove();         
         let workspace_newname=document.createElement('div');
 
-        fetch('/workspace',{
-          method:"POST",
-          headers:{
-            "Content-Type":"application/json"
-          },
-          body:JSON.stringify({
-            email:document.cookie.split("=")[1],
-            check:2,
-            workspace_new:title,
-            workspacename:name
-          })
-        });
+        axios.post("https://serverhost-rho.vercel.app/workspace",{
+          email:document.cookie.split("=")[1],
+          check:2,
+          workspace_new:title,
+          workspacename:name
+        })
       
         workspace_newname.addEventListener('dblclick',edit)
         workspace_newname.innerHTML=title;
@@ -205,17 +196,11 @@ function Sidepanel(props) {
     workspacetab.appendChild(text);
     workspacetab.appendChild(button);
 
-    fetch('/workspace',{
-      method:"POST",
-      headers:{
-        "Content-Type":"application/json"
-      },
-      body:JSON.stringify({
-        email:document.cookie.split("=")[1],
-        workspacename:text.innerHTML,
-        check:0,
-      })
-    });
+    axios.post("https://serverhost-rho.vercel.app/workspace",{
+      email:document.cookie.split("=")[1],
+      workspacename:text.innerHTML,
+      check:0,
+    })
 
     // props.sender(true);
   });

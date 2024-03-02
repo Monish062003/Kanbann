@@ -2,6 +2,7 @@ import React,{useEffect, useState} from 'react'
 import  '../Css/navbar.css'
 import {auth,provider} from '../googleauth/login'
 import { signInWithPopup } from 'firebase/auth';
+import axios from "axios"
 
 function Navbar() {
   const[btnname,setbtnname]=useState('Login with Google');
@@ -19,16 +20,9 @@ function Navbar() {
   const Login=(()=>{
     signInWithPopup(auth,provider).then(async(data)=>{
       document.cookie = `${data.user.displayName}=${data.user.email}; expires=Fri, 31 Dec 9999 23:59:59 GMT; path=/`;
-      
-      let response = await fetch('/email',{
-        method:'POST',
-        headers:{
-          'Content-Type':'application/json'
-        },
-        body:JSON.stringify({
-          email:data.user.email,
-        })
-      });
+      let response = axios.post("https://serverhost-rho.vercel.app/email",{
+        "email": `${data.user.email}`,
+      })
       
       response = await response.json();
       if (response != "") {
