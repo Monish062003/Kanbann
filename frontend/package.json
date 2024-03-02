@@ -1,14 +1,16 @@
 {
   "name": "frontend",
   "version": "0.1.0",
-  "proxy": "https://serverhost-rho.vercel.app/",
   "private": true,
   "dependencies": {
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
+    "axios": "^1.6.7",
+    "cors": "^2.8.5",
     "firebase": "^10.7.1",
     "js-cookie": "^3.0.5",
+    "random": "^4.1.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-google-button": "^0.7.2",
