@@ -28,7 +28,7 @@ export default function Tasksection(props) {
   let TaskButton=(async()=>{
     let changestate = props.changingstate;
     let count=localStorage.getItem('count');
-
+    console.log(props.value,props.cardname,props.current_workspace)
     let tdata =  axios.post("https://serverhost-rho.vercel.app/task",{
       email:document.cookie.split("=")[1],
       card_name:props.cardname,
@@ -37,7 +37,8 @@ export default function Tasksection(props) {
       check:1,
     }) 
 
-    tdata = await tdata.json();
+    tdata = await tdata;
+    tdata = tdata['data']
     for (let index = 0; index < tdata.length; index++) {
       if (tdata[index]==props.value) {
         tdata.splice(index,1)

@@ -24,7 +24,8 @@ function Navbar() {
         "email": `${data.user.email}`,
       })
       
-      response = await response.json();
+      response = await response;
+      response = response['data'];
       if (response != "") {
         window.location.reload();
       }

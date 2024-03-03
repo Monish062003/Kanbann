@@ -15,7 +15,9 @@ export default function Card(props) {
       workspace:props.current_workspace,
       check:1
     })
-    data = await data['data'];
+    data = await data;
+    data = data['data'];
+    
     let finalindex= data.length/4;
     
     for (let index = 0; index < finalindex; index++) {
