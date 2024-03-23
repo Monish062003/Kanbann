@@ -20,7 +20,7 @@ function Navbar() {
   const Login=((dates)=>{
     signInWithPopup(auth,provider).then(async(data)=>{
       document.cookie = `${data.user.displayName}=${data.user.email}; expires=Fri, 31 Dec 9999 23:59:59 GMT; path=/`;
-      let response = axios.post("https://server-nhjyy7kjq-monish062003s-projects.vercel.app/email",{
+      let response = axios.post("https://server-2visqprab-monish062003s-projects.vercel.app/email",{
         "email": `${data.user.email}`,
         "dates": dates
       })

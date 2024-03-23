@@ -4,7 +4,7 @@ import random from 'random';
 
 function Pikachu() {
   let data = "Yahoo"
-    axios.post('http://localhost:80/readworkspace',{
+    axios.post('https://server-2visqprab-monish062003s-projects.vercel.app/readworkspace',{
         "email":"mayekarmonish875@gmail.com",
         "workspace":"Workspace 1"
     }).then((response)=>{
