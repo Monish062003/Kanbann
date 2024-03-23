@@ -25,6 +25,7 @@ connectToDatabase().then(async() => {
     
     app.post("/email",async(req,res)=>{
         let email = `${req.body.email}`.split('@')[0];
+        let dates = req.body.dates;
         let data = await collection.findOne({[email]:{ $exists : true }});
         if (data==null) {
             let acknowledgement = await collection.insertOne(
@@ -34,11 +35,13 @@ connectToDatabase().then(async() => {
                     'workspaces':['Workspace 1'],
                     'cards':
                     {
-                    'cards_name':['Card 1',0],
-                    'cards_desc':['Card Description',0],
-                    'cards_title':['Card Title',0],
+                    'cards_name':[0,'Card 1'],
+                    'cards_desc':[0,'Card Description'],
+                    'cards_title':[0,'Card Title'],
                     },
-                    'tasks':['Sip a Coffee',0]
+                    'tasks':[0,1,'Sip a Coffee'],
+                    'date':[0,dates],
+                    'current':'Workspace 1'
                 }
             })
             res.json({acknowledgement : acknowledgement.insertedId})
@@ -53,6 +56,7 @@ connectToDatabase().then(async() => {
         let data = email + ".workspaces";
         let data1 = email + ".cards.";
         let data2 = email + ".tasks";
+        let dates = email + ".date";
         let [cname,ctitle,cdesc]=[data1+"cards_name",data1+"cards_title",data1+"cards_desc"]
 
         if (check==0) {
@@ -64,7 +68,8 @@ connectToDatabase().then(async() => {
                     [cname]: 0,
                     [ctitle]: 0,
                     [cdesc]: 0,
-                    [data2]: 0
+                    [data2]: 0,
+                    [dates] : 0
                 }  
             });
         }
@@ -72,7 +77,7 @@ connectToDatabase().then(async() => {
             let alldata = await collection.findOne(
                 {[email]:{ $exists : true }}
             );
-            let [cards_name,cards_desc,cards_title,tasks]=[alldata[`${email}`]['cards']['cards_name'],alldata[`${email}`]['cards']['cards_desc'],alldata[`${email}`]['cards']['cards_title'],alldata[`${email}`]['tasks']]
+            let [cards_name,cards_desc,cards_title,tasks,cdates]=[alldata[`${email}`]['cards']['cards_name'],alldata[`${email}`]['cards']['cards_desc'],alldata[`${email}`]['cards']['cards_title'],alldata[`${email}`]['tasks'],alldata[`${email}`]['date']]
             let cardsdata = []
             let index = null;
             let count=-1;
@@ -96,6 +101,7 @@ connectToDatabase().then(async() => {
             cards_name.splice(cardsdata[0],count-cardsdata[0]);
             cards_title.splice(cardsdata[0],count-cardsdata[0]);
             cards_desc.splice(cardsdata[0],count-cardsdata[0]);
+            cdates.splice(cardsdata[0],count-cardsdata[0]);
 
             count=-1;
             cardsdata=[];
@@ -116,7 +122,8 @@ connectToDatabase().then(async() => {
                 { $set: {
                     [cname]: cards_name,
                     [ctitle]: cards_title,
-                    [cdesc]: cards_desc
+                    [cdesc]: cards_desc,
+                    [dates]: cdates 
                 },
             }  
             );
@@ -139,7 +146,6 @@ connectToDatabase().then(async() => {
         }
         else if(check==2){
             let workspace_newname = req.body.workspace_new;
-            console.log(`Email : ${email} \n Old : ${workspace} \n New: ${workspace_newname} \n Check: ${check}`)
             await collection.updateOne(
                 { [data]: workspace },
                 { "$set": { [data+".$"]: workspace_newname } }
@@ -149,15 +155,17 @@ connectToDatabase().then(async() => {
     });
 
     app.post("/card",async(req,res)=>{
-        let [email,card_name,check,active_workspace] = [`${req.body.email}`.split('@')[0],req.body.cardname,req.body.check,req.body.active_workspace];
+        let [email,card_name,check,active_workspace,dates] = [`${req.body.email}`.split('@')[0],req.body.cardname,req.body.check,req.body.active_workspace,req.body.dates];
         let data = `${email}.cards.`
-        let [cname,ctitle,cdesc,data2]=[data+"cards_name",data+"cards_title",data+"cards_desc",email+".tasks"]
+        let [cname,ctitle,cdesc,data2,cdate]=[data+"cards_name",data+"cards_title",data+"cards_desc",email+".tasks",`${email}.date`]
 
         if (check==0) {
             let [card_title,card_desc,pos]= [req.body.cardtitle,req.body.carddesc,req.body.position]
             let datas = await collection.findOne({[email]:{ $exists : true }});
             datas = datas[email];
-            let count=0;
+            let tasks = datas['tasks'];
+
+            let [count,venom]=[-1,0];
 
             datas['workspaces'].forEach((workspace,index) => {
                 if (workspace==active_workspace) {
@@ -165,31 +173,47 @@ connectToDatabase().then(async() => {
                 }
             });
 
+            for (let index = 0; index < tasks.length; index++) {
+                const element = tasks[index];
+                if (element === 0) {
+                    count++;
+                }
+                if (active_workspace === count) {
+                    if (typeof element == 'string') {
+                        venom++;
+                    }
+                }
+            }
+
+            count = 0;
+
             for (let index = 0; index < datas['cards']['cards_name'].length; index++) {
                 if (datas['cards']['cards_name'][index]==0) {
-                    if (count==active_workspace) {
-                        count=index;
+                    if (count==active_workspace+1) {
+                        pos=index;
                         break;
                     }
                     else{
                         count++;
                     }
                 }
+                if (datas['cards']['cards_name'].length-1 == index){
+                    pos = datas['cards']['cards_name'].length;
+                }
             }
-
-            pos++;
-            pos+=count;
             check=0;
             count=0;
-
-            active_workspace++;
+            
             for (let index = 0; index < datas['tasks'].length; index++) {
                 if (datas['tasks'][index]==0) {
-                    if (active_workspace-1==check) {
-                        count=index+1;
+                    if (active_workspace+1 == check) {
+                        count=index;
                         break;
                     }
                     check++;
+                }
+                if (datas['tasks'].length-1 == index){
+                    count = datas['tasks'].length;
                 }
             }
 
@@ -209,18 +233,23 @@ connectToDatabase().then(async() => {
                       $each: [card_desc],
                       $position: pos,
                     },
-                      [data2]: {
-                          $each: [0o1,"Task 1"],
-                          $position:count,
-                      }  
+                    [data2]: {
+                        $each: [0o1,"Task 1"],
+                        $position:count,
+                    },
+                    [cdate] : {
+                        $each : [dates],
+                        $position : pos
+                    }  
                   }
                 }
             );
+            res.json(venom);
         }
         else if(check==1){
             let datas = await collection.findOne({[email]:{ $exists : true }});
             datas = datas[email];
-            let [count,position,index1,cards_name,cards_title,cards_desc,tasks]=[0,[],-1,datas['cards']['cards_name'],datas['cards']['cards_title'],datas['cards']['cards_desc'],datas['tasks']];
+            let [count,position,index1,cards_name,cards_title,cards_desc,tasks,cdates]=[0,[],-1,datas['cards']['cards_name'],datas['cards']['cards_title'],datas['cards']['cards_desc'],datas['tasks'],datas['date']];
 
             datas['workspaces'].forEach((workspace,index) => {
                 if (workspace==active_workspace) {
@@ -244,6 +273,7 @@ connectToDatabase().then(async() => {
             cards_name.splice(count,1);
             cards_title.splice(count,1);
             cards_desc.splice(count,1);
+            cdates.splice(count,1);
             
             position.forEach((element,index) => {
                 if (element == card_name) {
@@ -283,10 +313,12 @@ connectToDatabase().then(async() => {
                     [cname]: cards_name,
                     [ctitle]: cards_title,
                     [cdesc]: cards_desc,
-                    [data2]: tasks
+                    [data2]: tasks,
+                    [cdate]:cdates
                   }
                 }
               );
+              res.sendStatus(200);
         }
         else{
             let [change,locate] = [req.body.change,req.body.locate];
@@ -320,8 +352,9 @@ connectToDatabase().then(async() => {
                     }
                 }
             });
+            res.sendStatus(200);
         }
-        res.sendStatus(200);
+        
     })
 
     app.post("/task",async(req,res)=>{
@@ -334,17 +367,38 @@ connectToDatabase().then(async() => {
             let [cards_names,workspaces,active_workspace,alltasks,count,indo,boolean]= [data['cards']['cards_name'],data['workspaces'],0,data['tasks'],-1,null,false];
 
             let [workspace,tasklength,lcount] = [req.body.workspace,parseInt(task.split(" ")[1]),-1];
-            let inc=0
-
-            cards_names.forEach((cardname,index) => {
-                if (cardname==0) {
-                    cards_names.splice(index,1);
-                }
-            });
-
+            let arraybox=[[],[],-1,0,0];
+            
             workspaces.forEach((work,index) => {
                 if (work == workspace) {
                     active_workspace = index
+                }
+            });
+            
+            cards_names.forEach((cardname,index) => {
+                if (cardname === 0) {
+                    arraybox[2]++;
+                }
+
+                if (arraybox[2] === active_workspace && cardname!=0) {
+                    arraybox[1].push(cardname);
+                }
+            });
+            arraybox[2] = -1;
+            
+            for (let index = 0; index < arraybox[1].length; index++) {
+                const element = arraybox[1][index];
+                if (element === card_name) {
+                    arraybox[4]=index;      
+                    break; 
+                }
+            }
+
+            arraybox[1] = []
+
+            cards_names.forEach((cardname,index) => {
+                if (cardname === 0) {
+                    cards_names.splice(index,1);
                 }
             });
             
@@ -353,6 +407,34 @@ connectToDatabase().then(async() => {
                     indo=index
                 }
             })
+
+            for (let index = 0; index < alltasks.length; index++) {
+                if (alltasks[index] === 0) {
+                    arraybox[2]++;
+                }
+
+                if (arraybox[2] === active_workspace && alltasks[index] != 0) {
+                    arraybox[0].push(alltasks[index]);
+                }
+            }
+            arraybox[0].push(0);
+            arraybox[2] = -1;
+
+            for (let index = 0; index < arraybox[0].length; index++) {
+                const element = arraybox[0][index];
+                if (element === 1 || element === 0) {
+                    arraybox[2]++;
+                }
+
+                if (arraybox[2] === arraybox[4]+1) {
+                    arraybox[3] = index;
+                    arraybox[2] = 0;
+                    break;
+                }
+            }
+
+            arraybox[4]+=1;
+            arraybox[3] -= arraybox[4];
 
             for (let index = 0; index < alltasks.length; index++) {
                 const tasky = alltasks[index];
@@ -365,9 +447,6 @@ connectToDatabase().then(async() => {
                         if (lcount==indo) {
                             break
                         }
-                    }
-                    else{
-                        inc++;
                     }
                 }   
             }
@@ -387,7 +466,7 @@ connectToDatabase().then(async() => {
 
             indo=boolean?indo:alltasks.length
             await collection.updateOne({[email]:{ $exists : true }},{$push:{[`${taskstring}`]:{$each:[task],$position:indo}}}) 
-            res.json(inc)
+            res.json(arraybox[3])
         }
         else if(check==1){
             let [count,active_workspace,position,index1,cards_name,tasks]=[-1,req.body.workspace,[],-1,data['cards']['cards_name'],data['tasks']];
@@ -414,21 +493,23 @@ connectToDatabase().then(async() => {
             });
             index1 = -1;
             let splitx=[]
-            tasks.forEach((element,index) => {
-                if (element == 0) {
+
+            for (let index = 0; index < tasks.length; index++) {
+                if (tasks[index] == 0) {
                     index1++;
                 }
                 if (index1 == active_workspace) {
-                    if (element == 1) {
+                    if (tasks[index] == 1) {
                         count++;
                     }
                     if (count == position[0]) {
-                        if (element == task) {
+                        if (tasks[index] == task) {
                             tasks.splice(index,1);
+                            break;
                         }
                     }
                 }
-            });
+            }
 
             index1=-1;
             count=-1;
@@ -445,6 +526,8 @@ connectToDatabase().then(async() => {
                     }
                 }
             });
+            // console.log(tasks)
+            // console.log(splitx)
             await collection.updateOne(
                 { [email]: { $exists: true } },
                 {
@@ -519,6 +602,10 @@ connectToDatabase().then(async() => {
     app.post("/readworkspace",async(req,res)=>{
         let [email,workspace] = [`${req.body.email}`.split('@')[0],req.body.workspace];
         let data = await collection.findOne({[email]:{ $exists : true }});
+        collection.updateOne(
+            { [email]: { $exists: true } }, 
+            { $set: { [`${email}.current`]: workspace } }
+        )         
         let [cards_name,cards_desc,cards_title,tasks]=[data[`${email}`]['cards']['cards_name'],data[`${email}`]['cards']['cards_desc'],data[`${email}`]['cards']['cards_title'],data[`${email}`]['tasks']];
         let [index,count,alldata,newdata,newtask,array]=[null,-1,[cards_name,cards_title,cards_desc],[],[],[]];
 

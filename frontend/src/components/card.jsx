@@ -10,7 +10,7 @@ export default function Card(props) {
     let changestate= props.changestate;
     let carry=0;
 
-    let data = axios.post("https://serverhost-rho.vercel.app/readworkspace",{
+    let data = axios.post("https://server-nhjyy7kjq-monish062003s-projects.vercel.app/readworkspace",{
       email: document.cookie.split("=")[1],
       workspace:props.current_workspace,
       check:1
@@ -38,9 +38,10 @@ export default function Card(props) {
       }
       cardsarray.push(<Card name={data[index]} title={data[index+finalindex]} desc={data[index+2*finalindex]} tasks={data[index+3*finalindex]} beforetaskslength={carry} changestate={changestate} arrange={index} current_workspace={props.current_workspace}/>)
     }
+    console.log(cardsarray)
     changestate([...cardsarray])      
     
-    axios.post("https://serverhost-rho.vercel.app/card",{
+    axios.post("https://server-nhjyy7kjq-monish062003s-projects.vercel.app/card",{
       email: document.cookie.split("=")[1],
       active_workspace: props.current_workspace,
       cardname: props.name,
@@ -72,7 +73,7 @@ export default function Card(props) {
     }, [props.tasks])
     
     let AddTask=(async()=>{
-      let tdata = axios.post("https://serverhost-rho.vercel.app/task",{
+      let tdata = axios.post("https://server-nhjyy7kjq-monish062003s-projects.vercel.app/task",{
         email:document.cookie.split("=")[1],
         card_name:props.name,
         task: `Task ${tasks.length+1}`,
@@ -82,7 +83,7 @@ export default function Card(props) {
       
       tdata = await tdata
       tdata = tdata['data']
-      setTasks([...tasks, <Tasksection cardname={props.name} title={props.title} beforetaskslength={parseInt(tdata)} taskarrange={parseInt(tasks.length)} value={`Task ${tasks.length+1}`} changingstate={setTasks} current_workspace={props.current_workspace}/>]);
+      setTasks([...tasks, <Tasksection cardname={props.name} title={props.title} beforetaskslength={parseInt(tdata)} taskarrange={0} value={`Task ${tasks.length+1}`} changingstate={setTasks} current_workspace={props.current_workspace}/>]);
     });
 
     let savetype=(async(event)=>{
@@ -100,10 +101,10 @@ export default function Card(props) {
           locate = 2;
         }
         
-        axios.post("https://serverhost-rho.vercel.app/card",{
+        axios.post("https://server-nhjyy7kjq-monish062003s-projects.vercel.app/card",{
           email:document.cookie.split("=")[1],
           change: newtitle,
-          cardname: props.name,
+          cardname: event.target.parentElement.parentElement.getAttribute('name'),
           check:2,
           locate:locate
         })

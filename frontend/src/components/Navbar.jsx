@@ -17,11 +17,12 @@ function Navbar() {
     refreshstopper++;
   },[])
   
-  const Login=(()=>{
+  const Login=((dates)=>{
     signInWithPopup(auth,provider).then(async(data)=>{
       document.cookie = `${data.user.displayName}=${data.user.email}; expires=Fri, 31 Dec 9999 23:59:59 GMT; path=/`;
-      let response = axios.post("https://serverhost-rho.vercel.app/email",{
+      let response = axios.post("https://server-nhjyy7kjq-monish062003s-projects.vercel.app/email",{
         "email": `${data.user.email}`,
+        "dates": dates
       })
       
       response = await response;
@@ -39,8 +40,10 @@ function Navbar() {
   }
   
   const Check = () =>{
+    let date = new Date();
     if (btnname==='Login with Google') {
-      Login();
+      let dates = [date.getDate(),date.getMonth()+1,date.getFullYear(),date.getHours(),date.getMinutes()];
+      Login(dates);
       setbtnname('Signout');
     } else {
       SignOut();

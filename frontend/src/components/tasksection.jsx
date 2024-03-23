@@ -16,7 +16,7 @@ export default function Tasksection(props) {
     try {
       if (refreshstopper==0) {
         let elements = document.getElementsByClassName('list');
-        elements[props.beforetaskslength+props.taskarrange].children[0].children[0].placeholder=props.value;
+        elements[parseInt(props.beforetaskslength)+parseInt(props.taskarrange)].children[0].children[0].placeholder=props.value;
         refreshstopper++;
       }
     } catch (error) {
@@ -28,8 +28,8 @@ export default function Tasksection(props) {
   let TaskButton=(async()=>{
     let changestate = props.changingstate;
     let count=localStorage.getItem('count');
-    console.log(props.value,props.cardname,props.current_workspace)
-    let tdata =  axios.post("https://serverhost-rho.vercel.app/task",{
+    
+    let tdata =  axios.post("https://server-nhjyy7kjq-monish062003s-projects.vercel.app/task",{
       email:document.cookie.split("=")[1],
       card_name:props.cardname,
       workspace:props.current_workspace,
@@ -61,10 +61,9 @@ export default function Tasksection(props) {
   const savetype = async(event)=>{
     if (event.key === 'Enter') {
       let [oldvalue,newvalue] = [inputvalue.current.placeholder,inputvalue.current.value];
-      console.log(oldvalue,newvalue)
       inputvalue.current.placeholder=newvalue;
       
-      let tdata =  axios.post("https://serverhost-rho.vercel.app/task",{
+      let tdata =  axios.post("https://server-nhjyy7kjq-monish062003s-projects.vercel.app/task",{
         email:document.cookie.split("=")[1],
         card_name:props.cardname,
         workspace:props.current_workspace,

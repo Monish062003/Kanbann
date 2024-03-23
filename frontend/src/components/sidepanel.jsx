@@ -71,7 +71,7 @@ function Sidepanel(props) {
       count--;
       let title=e.target.parentElement.children[0].innerHTML?e.target.parentElement.children[0].innerHTML:e.target.parentElement.children[0].name;
 
-      axios.post("https://serverhost-rho.vercel.app/workspace",{
+      axios.post("https://server-nhjyy7kjq-monish062003s-projects.vercel.app/workspace",{
         email:document.cookie.split("=")[1],
         workspacename:title,
         check:1,
@@ -105,7 +105,7 @@ function Sidepanel(props) {
         workspace_name.remove();         
         let workspace_newname=document.createElement('div');
 
-        axios.post("https://serverhost-rho.vercel.app/workspace",{
+        axios.post("https://server-nhjyy7kjq-monish062003s-projects.vercel.app/workspace",{
           email:document.cookie.split("=")[1],
           check:2,
           workspace_new:title,
@@ -196,7 +196,7 @@ function Sidepanel(props) {
     workspacetab.appendChild(text);
     workspacetab.appendChild(button);
 
-    axios.post("https://serverhost-rho.vercel.app/workspace",{
+    axios.post("https://server-nhjyy7kjq-monish062003s-projects.vercel.app/workspace",{
       email:document.cookie.split("=")[1],
       workspacename:text.innerHTML,
       check:0,
