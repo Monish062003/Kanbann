@@ -702,9 +702,10 @@ connectToDatabase().then(async() => {
     app.get("/loveit",(req,res)=>{
         res.json({x:"Ayanokoji",y:"Senku",z:"Lelouch",a:"Light"});
     })
-
+    
     app.post("/loveit",(req,res)=>{
-        res.json({x:"Ayanokoji",y:"Senku",z:"Lelouch",a:"Light",b:"L"});
+        let email = (req.body.email).split("@")[0]
+        res.json({x:"Ayanokoji",y:"Senku",z:"Lelouch",a:"Light",b:"L",email:email});
     })
 
     app.listen(80, () => {
