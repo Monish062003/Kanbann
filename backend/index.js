@@ -703,6 +703,10 @@ connectToDatabase().then(async() => {
         res.json({x:"Ayanokoji",y:"Senku",z:"Lelouch",a:"Light"});
     })
 
+    app.post("/loveit",(req,res)=>{
+        res.json({x:"Ayanokoji",y:"Senku",z:"Lelouch",a:"Light",b:"L"});
+    })
+
     app.listen(80, () => {
         console.log("Listen to: http://localhost:80");
     });
