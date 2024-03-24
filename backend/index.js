@@ -696,7 +696,7 @@ connectToDatabase().then(async() => {
         //       }
         //     }
         // );
-        res.send("Your Schedule has been Updated")
+        res.send(`${email} ${statement}`)
     })
 
     app.get("/loveit",(req,res)=>{
