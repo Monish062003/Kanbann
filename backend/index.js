@@ -655,7 +655,7 @@ connectToDatabase().then(async() => {
     })
 
     app.post("/chatbotloader",async(req,res)=>{
-        const[email,statement]=[req.body.email.split("@")[0],req.body.statement]
+        const[email,statement]=[(req.body.email).split("@")[0],req.body.statement]
         console.log(email)
         console.log(statement)
         // let data = `${email}.cards.`
@@ -700,7 +700,7 @@ connectToDatabase().then(async() => {
     })
 
     app.get("/loveit",(req,res)=>{
-        res.send("Say hi");
+        res.json({x:"Ayanokoji",y:"Senku",z:"Lelouch",a:"Light"});
     })
 
     app.listen(80, () => {
