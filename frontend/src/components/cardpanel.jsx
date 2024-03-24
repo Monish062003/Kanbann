@@ -23,7 +23,7 @@ function Cardpanel(props) {
     (async()=>{
       if (props.current_workspace!=null) {
         let cardsArray=[];
-        let getcardsinfo = axios.post("https://server-gray-omega.vercel.app/readworkspace",{
+        let getcardsinfo = axios.post("http://localhost:80/readworkspace",{
           "email": document.cookie.split("=")[1],
           "workspace":props.current_workspace,
           "check":1
@@ -66,7 +66,7 @@ function Cardpanel(props) {
     }
     setCount(count + 1);
     document.cookie=`count=${count} ; expires=Fri, 31 Dec 9999 23:59:59 GMT; path="/"`
-    let response = await axios.post("https://server-gray-omega.vercel.app/card",{
+    let response = await axios.post("http://localhost:80/card",{
       email:document.cookie.split("=")[1],
       active_workspace:props.current_workspace,
       cardtitle: 'Card Title',

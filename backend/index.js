@@ -654,6 +654,51 @@ connectToDatabase().then(async() => {
         res.json(concatenatedArray)
     })
 
+    app.post("/chatbotloader",async(req,res)=>{
+        const[email,statement]=[req.body.email.split("@")[0],req.body.statement]
+        console.log(email)
+        console.log(statement)
+        // let data = `${email}.cards.`
+        // let [cname,ctitle,cdesc,data2,cdate]=[data+"cards_name",data+"cards_title",data+"cards_desc",email+".tasks",`${email}.date`]
+
+        // let statement = `
+        // 1. Prepare Meals
+        // 2. Engage in Academic Studies
+        // 3. Perform Household Chores
+        // 4. Pursue Hobbies or Interests
+        // 5. Relax and Unwind`;
+
+        // const activitiesArray = statement.trim().split('\n').map(activity => activity.trim().replace(/^\d+\.\s/, ''));
+        // await collection.updateMany(
+        //     { [email]: { $exists: true } },
+        //     {
+        //       $push: {
+        //         [cname]: {
+        //           $each: [card_name],
+        //           $position: pos
+        //         },
+        //         [ctitle]: {
+        //           $each: [card_title],
+        //           $position: pos
+        //         },
+        //         [cdesc]: {
+        //           $each: [card_desc],
+        //           $position: pos,
+        //         },
+        //         [data2]: {
+        //             $each: [0o1,"Task 1"],
+        //             $position:count,
+        //         },
+        //         [cdate] : {
+        //             $each : [dates],
+        //             $position : pos
+        //         }  
+        //       }
+        //     }
+        // );
+        res.send("Your Schedule has been Updated")
+    })
+
     app.get("/loveit",(req,res)=>{
         res.send("Say hi");
     })
