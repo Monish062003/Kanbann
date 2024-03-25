@@ -696,7 +696,7 @@ connectToDatabase().then(async() => {
         //       }
         //     }
         // );
-        res.send(`${email} ${statement}`)
+        res.json({email:`${email}`,statement:`${statement}`})
     })
 
     app.get("/loveit",(req,res)=>{
