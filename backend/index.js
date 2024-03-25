@@ -1,11 +1,11 @@
-const express = require('express');
+import express, { urlencoded } from 'express';
 const app = express();
-const cors = require('cors')
-const bodyParser = require('body-parser');
-const {MongoClient} = require('mongodb');
+import cors from 'cors';
+import { json } from 'body-parser';
+import { MongoClient } from 'mongodb';
 
-app.use(express.urlencoded());
-app.use(bodyParser.json());
+app.use(urlencoded());
+app.use(json());
 app.use(cors())
 
 
@@ -660,18 +660,9 @@ connectToDatabase().then(async() => {
         let data = `${email}.cards.`
         let [cname,ctitle,cdesc,data2,cdate]=[data+"cards_name",data+"cards_title",data+"cards_desc",email+".tasks",`${email}.date`]
 
-        // let statement = `
-        // 1. Prepare Meals
-        // 2. Engage in Academic Studies
-        // 3. Perform Household Chores
-        // 4. Pursue Hobbies or Interests
-        // 5. Relax and Unwind`;
+        statement = `${statement}`;
 
-<<<<<<< HEAD
         // const activitiesArray = statement.match(/\d+\.\s(.+?)(?=\s\d+\.|\s*$)/g).map(activity => activity.replace(/^\d+\.\s/, ''));
-=======
-        const activitiesArray = statement.match(/\d+\.\s(.+?)(?=\s\d+\.|\s*$)/g).map(activity => activity.replace(/^\d+\.\s/, ''));
->>>>>>> 8a2c51e13b29f4c191d0edf2070e7a3bc1d0e297
         // await collection.updateMany( 
         //     { [email]: { $exists: true } },
         //     {
@@ -714,8 +705,4 @@ connectToDatabase().then(async() => {
     app.listen(80, () => {
         console.log("Listen to: http://localhost:80");
     });
-<<<<<<< HEAD
 })
-=======
-})
->>>>>>> 8a2c51e13b29f4c191d0edf2070e7a3bc1d0e297
