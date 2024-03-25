@@ -695,7 +695,7 @@ connectToDatabase().then(async() => {
         //       }
         //     }
         // );
-        res.json({email:`${data}`,statement:`${activitiesArray[2]}`})
+        res.json({email:`${data}`,statement:`${statement}`})
     })
 
     app.get("/loveit",(req,res)=>{
