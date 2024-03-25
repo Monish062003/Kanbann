@@ -667,7 +667,11 @@ connectToDatabase().then(async() => {
         // 4. Pursue Hobbies or Interests
         // 5. Relax and Unwind`;
 
+<<<<<<< HEAD
         // const activitiesArray = statement.match(/\d+\.\s(.+?)(?=\s\d+\.|\s*$)/g).map(activity => activity.replace(/^\d+\.\s/, ''));
+=======
+        const activitiesArray = statement.match(/\d+\.\s(.+?)(?=\s\d+\.|\s*$)/g).map(activity => activity.replace(/^\d+\.\s/, ''));
+>>>>>>> 8a2c51e13b29f4c191d0edf2070e7a3bc1d0e297
         // await collection.updateMany( 
         //     { [email]: { $exists: true } },
         //     {
@@ -710,4 +714,8 @@ connectToDatabase().then(async() => {
     app.listen(80, () => {
         console.log("Listen to: http://localhost:80");
     });
+<<<<<<< HEAD
 })
+=======
+})
+>>>>>>> 8a2c51e13b29f4c191d0edf2070e7a3bc1d0e297
