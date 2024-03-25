@@ -1,0 +1,339 @@
+
+@import url('https://fonts.googleapis.com/css2?family=Croissant+One&family=Roboto:wght@500;700&display=swap');
+*{
+    margin: 0px;
+    padding: 0px;
+}
+
+.card-container{
+    --totalmaxwidth:18vw;
+    --totalminwidth:3vw;
+    --totalheight:92vh;
+    width:calc(100vw - var(--totalmaxwidth));
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.card-container .addcardbtn , #button-addon2{
+    color: white;
+    width: max-content;
+    border: 2.5px solid #70DAD4;;
+    border-radius: 0.375rem;
+    background: rgba(48, 54, 60, 0.55);
+    padding: 0.5vw;
+    padding: 0vw 0.5vw;
+    height: 4.5vh;
+    font-size: 0.9rem;
+    margin-right: auto;
+    position: relative;
+    font-weight: 500;
+    font-family: Roboto;
+    left: 3.5vw;
+}
+
+#button-addon2{
+    border: 1px solid rgb(150, 212, 130);
+    background-color: rgb(77, 195, 77);
+    position: relative;
+    left: 0vw;
+    top: 0vh;
+    border-radius: 0rem 0.375rem 0.375rem 0rem;
+    border-left: none;
+}
+
+.cdatapanel .form-control{
+    font-weight: bold;
+    height: 4.5vh;
+}
+
+.card-container .addcardbtn:hover {
+    background-color: rgba(48, 54, 60, 0.77);
+}
+
+.innercontainer{
+    margin-top: 5vh;
+    width: calc(calc(100vw) - var(--totalmaxwidth) - 7vw);
+    height: 65vh;
+    display: flex;
+    align-items: self-start;
+    gap: 30px; 
+    overflow-x: scroll;
+}
+
+.innercontainer::-webkit-scrollbar{
+    width: 0.8rem;
+    height: 0.8rem;
+}
+
+.innercontainer::-webkit-scrollbar-track{
+    background-color: rgb(47, 44, 44);
+    border-radius: 20px;
+}
+
+.innercontainer::-webkit-scrollbar-thumb{
+    background-color: rgb(130, 182, 195);
+    border-radius: 20px;
+    border:0.2rem solid transparent;
+    background-clip: content-box;
+}
+
+.innercontainer::-webkit-scrollbar-thumb:hover{
+    background-color: antiquewhite;
+}
+
+.card{
+    ---cardwidth:20vw;
+    display: flex;
+    flex-direction: column;
+    width: var(---cardwidth);
+    height: max-content;
+    border: 1px solid black;
+    border-radius: 17px;
+    padding-bottom: 15px;
+    background-color: rgba(33, 130, 138, 0.4);
+}
+
+.card .cardtitle{
+    margin-top: 5px;
+    width: auto;
+    display: flex;
+    font-weight: bold;
+    gap: 5px;
+    align-items: center;
+    font-size: 1.6rem;
+}
+
+.cardtitle .ctitle{
+    width: calc(var(---cardwidth) - 3vw);
+    height: auto;
+    margin-left: 0.5vw;
+}
+
+.cardtitle .ctitleinpu{
+    font-size: 1.1rem;
+    width: calc(var(---cardwidth) - 3.5vw);
+    padding-left: 0.5vw;
+    border: 0px none;
+    border-radius: 10px;
+    height: 4.5vh;
+    margin-left: 0.5vw;
+}
+
+.stylediv{
+    display: flex;
+    justify-content: start;
+    width: min-content;
+}
+
+.carddatacontainer{
+    margin-top: 10px;
+    width: auto;
+    height: max-content;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+
+.carddatacontainer .cdatapanel{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-left: 5px;
+    width: calc(var(---cardwidth) - 2vw);
+}
+
+.card .cdataimg{
+    width: 1.25vw;
+    height: 2.5vh;
+    position: relative;
+    right: 4px;
+    position: relative;
+    right: 1.5vw;
+    cursor:pointer;
+}
+
+.cardtitle img{
+    cursor: pointer;
+    width: 1.5vw;
+    height: 3vh;
+    border-radius: 50%;
+}
+
+.card .cdatatext{
+    margin-left: 0.5vw;
+    width: var(--totalmaxwidth);
+    border: 0px none;
+    border-radius: 6px;
+    font-weight: bold;
+    font-family: Roboto;
+}
+
+.card .carddesc{
+    width: calc(auto - 0.6vw);
+    display: flex;
+    margin-left: 0.6vw;
+    font-weight: bold;
+    align-items: center;
+    font-size: 1rem;
+}
+
+.carddesc .cdesc{
+    width: auto;
+    border: 0px none;
+    border-radius: 10px;
+}
+
+.card .line{
+    align-self: center;
+    margin-top: 10px;
+    width: calc(var(---cardwidth) - 2vw);
+    background-color: white;
+    height: 2px;
+    border-radius: 20px;
+}
+
+.taskadd button{
+    font-size: 0.8rem;
+    color: whitesmoke;
+    font-weight: 600;
+    padding: 5px;
+    background-color: rgb(77, 195, 77);
+    border: 1px solid rgb(150, 212, 130);
+    border-radius: 0.4rem;
+}
+
+.card-container .emaildisplay{
+    font-family: 'Croissant One', cursive;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 2rem;
+    color: #715353;
+    margin-top: 3vh;
+    position: relative;
+    bottom: 1vh;
+}
+
+.taskadd button:hover{
+    background-color: rgb(132, 197, 94);
+    box-shadow: 0px 0px 10px rgb(112, 197, 27);
+}
+
+.taskadd{
+    display: flex;
+    justify-content: end;
+    width: calc(var(---cardwidth) - 1.5vw);
+}
+
+.form-control{
+    background-color: rgba(144, 154, 161, 0.622);
+}
+
+@keyframes maxcardcontainer {
+    from{
+        width: calc(100vw - var(--totalmaxwidth));
+    }
+    to{
+        width: calc(100vw - var(--totalminwidth));
+    }
+}
+
+@keyframes mincardcontainer {
+    from{
+        width: calc(100vw - var(--totalminwidth));
+    }
+    to{
+        width: calc(100vw - var(--totalmaxwidth));
+    }
+}
+
+@keyframes maxinnercontainer {
+    from{
+        width: calc(calc(100vw) - var(--totalmaxwidth) - 7vw);
+    }
+    to{
+        width: calc(calc(100vw) - var(--totalminwidth) - 7vw);
+    }
+}
+
+@keyframes mininnercontainer {
+    from{
+        width: calc(calc(100vw) - var(--totalminwidth) - 7vw);
+    }
+    to{
+        width: calc(calc(100vw) - var(--totalmaxwidth) - 7vw);
+    }
+}
+
+.mincontainer{
+    animation: maxcardcontainer 2s ease-in-out 0s 1 forwards;
+}
+
+.mininnercontainer{
+    animation: maxinnercontainer 2s ease-in-out 0s 1 forwards;
+}
+
+.maxcontainer{
+    animation: mincardcontainer 2s ease-in-out 0s 1 forwards;
+}
+
+.maxinnercontainer{
+    animation: mininnercontainer 2s ease-in-out 0s 1 forwards;
+}
+
+@media screen and (min-width:768px) and (max-width:1024px) {
+    .card-container{
+        --totalmaxwidth: 32vw;
+        --totalminwidth: 6vw;
+    }
+
+    .cardtitle img{
+        width: 2.5vw;
+        height: 2vh;
+        position: relative;
+        right: 0.5vw;
+    }
+
+    .card .cardtitle{
+        font-size: 1.4rem;
+    }
+}
+
+@media screen and (max-width:768px) {
+    .card-container{
+        --totalmaxwidth: 49vw;
+        --totalminwidth: 6vw;
+    }
+
+    .card-container .emaildisplay{
+        font-size: 1.2rem;
+        margin-top: 0vh;
+        position: relative;
+        bottom: 5vh;
+    }
+
+    .innercontainer{
+        height: 55vh;
+    }
+
+    .card{
+        ---cardwidth:44vw;
+    }
+
+    .cardtitle img{
+        width: 5.5vw;
+        position: relative;
+        right: 1.5vw;
+    }
+
+    .card .cardtitle{
+        font-size: 1.3rem;
+    }
+
+    .card .carddesc{
+        font-size: 0.9rem;
+    }
+}
