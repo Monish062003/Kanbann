@@ -283,7 +283,6 @@
 .maxinnercontainer{
     animation: mininnercontainer 2s ease-in-out 0s 1 forwards;
 }
-
 @media screen and (min-width:768px) and (max-width:1024px) {
     .card-container{
         --totalmaxwidth: 32vw;

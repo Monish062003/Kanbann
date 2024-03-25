@@ -7,7 +7,7 @@ import axios from "axios"
 
 async function fetchWorkspaceData() {
   if (document.cookie.split("=")[1]!=undefined) {
-    const response = axios.post("http://localhost:80/email",{
+    const response = axios.post("https://server-gray-omega.vercel.app/email",{
       "email": `${document.cookie.split("=")[1]}`,
     })
 
