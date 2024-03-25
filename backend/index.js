@@ -667,7 +667,7 @@ connectToDatabase().then(async() => {
         // 4. Pursue Hobbies or Interests
         // 5. Relax and Unwind`;
 
-        const activitiesArray = statement.match(/\d+\.\s(.+?)(?=\s\d+\.|\s*$)/g).map(activity => activity.replace(/^\d+\.\s/, ''));
+        // const activitiesArray = statement.match(/\d+\.\s(.+?)(?=\s\d+\.|\s*$)/g).map(activity => activity.replace(/^\d+\.\s/, ''));
         // await collection.updateMany( 
         //     { [email]: { $exists: true } },
         //     {
@@ -695,7 +695,7 @@ connectToDatabase().then(async() => {
         //       }
         //     }
         // );
-        res.json({email:`${data}`,statement:`${activitiesArray[2]}`})
+        res.json({email:`${data}`,statement:`${statement}`})
     })
 
     app.get("/loveit",(req,res)=>{
