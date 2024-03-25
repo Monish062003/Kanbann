@@ -656,10 +656,9 @@ connectToDatabase().then(async() => {
 
     app.post("/chatbotloader",async(req,res)=>{
         const[email,statement]=[(req.body.email).split("@")[0],req.body.statement]
-        console.log(email)
-        console.log(statement)
-        // let data = `${email}.cards.`
-        // let [cname,ctitle,cdesc,data2,cdate]=[data+"cards_name",data+"cards_title",data+"cards_desc",email+".tasks",`${email}.date`]
+
+        let data = `${email}.cards.`
+        let [cname,ctitle,cdesc,data2,cdate]=[data+"cards_name",data+"cards_title",data+"cards_desc",email+".tasks",`${email}.date`]
 
         // let statement = `
         // 1. Prepare Meals
@@ -668,7 +667,7 @@ connectToDatabase().then(async() => {
         // 4. Pursue Hobbies or Interests
         // 5. Relax and Unwind`;
 
-        // const activitiesArray = statement.trim().split('\n').map(activity => activity.trim().replace(/^\d+\.\s/, ''));
+        const activitiesArray = statement.trim().split('\n').map(activity => activity.trim().replace(/^\d+\.\s/, ''));
         // await collection.updateMany(
         //     { [email]: { $exists: true } },
         //     {
@@ -696,7 +695,7 @@ connectToDatabase().then(async() => {
         //       }
         //     }
         // );
-        res.json({email:`${email}`,statement:`${statement}`})
+        res.json({email:`${data}`,statement:`${activitiesArray[1]}`})
     })
 
     app.get("/loveit",(req,res)=>{
