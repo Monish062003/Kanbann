@@ -29,7 +29,7 @@ export default function Tasksection(props) {
     let changestate = props.changingstate;
     let count=localStorage.getItem('count');
     
-    let tdata =  axios.post("http://localhost:80/task",{
+    let tdata =  axios.post("https://server-gray-omega.vercel.app/task",{
       email:document.cookie.split("=")[1],
       card_name:props.cardname,
       workspace:props.current_workspace,
@@ -63,7 +63,7 @@ export default function Tasksection(props) {
       let [oldvalue,newvalue] = [inputvalue.current.placeholder,inputvalue.current.value];
       inputvalue.current.placeholder=newvalue;
       
-      let tdata =  axios.post("http://localhost:80/task",{
+      let tdata =  axios.post("https://server-gray-omega.vercel.app/task",{
         email:document.cookie.split("=")[1],
         card_name:props.cardname,
         workspace:props.current_workspace,
