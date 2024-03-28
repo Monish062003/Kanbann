@@ -22,7 +22,8 @@ async function connectToDatabase() {
 
 connectToDatabase().then(async() => {
     collection = db.collection('emails');
-    
+    const date = new Date();
+
     app.post("/email",async(req,res)=>{
         let email = `${req.body.email}`.split('@')[0];
         let dates = req.body.dates;
@@ -57,10 +58,11 @@ connectToDatabase().then(async() => {
         let data1 = email + ".cards.";
         let data2 = email + ".tasks";
         let dates = email + ".date";
+        
+        const datess = [date.getDate(),date.getMonth()+1,date.getFullYear(),date.getHours(),date.getMinutes()];
         let [cname,ctitle,cdesc]=[data1+"cards_name",data1+"cards_title",data1+"cards_desc"]
 
         if (check==0) {
-            console.log(`Add : ${workspace}`)
             await collection.updateOne(
                 {[email]:{ $exists : true }},  
                 { $push:{ 
@@ -69,7 +71,7 @@ connectToDatabase().then(async() => {
                     [ctitle]: 0,
                     [cdesc]: 0,
                     [data2]: 0,
-                    [dates] : 0
+                    [dates] : datess
                 }  
             });
         }
@@ -101,8 +103,7 @@ connectToDatabase().then(async() => {
             cards_name.splice(cardsdata[0],count-cardsdata[0]);
             cards_title.splice(cardsdata[0],count-cardsdata[0]);
             cards_desc.splice(cardsdata[0],count-cardsdata[0]);
-            cdates.splice(cardsdata[0],count-cardsdata[0]);
-
+            
             count=-1;
             cardsdata=[];
             tasks.forEach((task,index1) => {
@@ -113,9 +114,10 @@ connectToDatabase().then(async() => {
                     }
                 }    
             });
-
+            
             count=cardsdata[1]?cardsdata[1]:tasks.length
             tasks.splice(cardsdata[0],count-cardsdata[0])
+            cdates.splice(cardsdata[0],count-cardsdata[0]);
 
             await collection.updateOne(
                 {[email]:{ $exists : true }},  
@@ -238,8 +240,8 @@ connectToDatabase().then(async() => {
                         $position:count,
                     },
                     [cdate] : {
-                        $each : [dates],
-                        $position : pos
+                        $each : [dates,dates],
+                        $position : count
                     }  
                   }
                 }
@@ -273,14 +275,13 @@ connectToDatabase().then(async() => {
             cards_name.splice(count,1);
             cards_title.splice(count,1);
             cards_desc.splice(count,1);
-            cdates.splice(count,1);
             
             position.forEach((element,index) => {
                 if (element == card_name) {
                     count = index;         
                 }
             });
-
+            
             position = [count];
             count=-1;
             tasks.forEach((task,index) => {
@@ -301,10 +302,11 @@ connectToDatabase().then(async() => {
                     }
                 }
             });
-
+            
             position.splice(0,1);
             count = position[1]?position[1]:tasks.length;
             tasks.splice(position[0],count-position[0])
+            cdates.splice(position[0],count-position[0]);
             
             await collection.updateOne(
                 { [email]: { $exists: true } },
@@ -361,11 +363,11 @@ connectToDatabase().then(async() => {
         const[email,task,card_name,check]=[`${req.body.email}`.split('@')[0],req.body.task,req.body.card_name,req.body.check];
         let taskstring = `${email}.tasks`
         let data = await collection.findOne({[email]:{ $exists : true }});
+        let dates = [date.getDate(),date.getMonth()+1,date.getFullYear(),date.getHours(),date.getMinutes()];
         data = data[email];
 
         if (check==0) {
             let [cards_names,workspaces,active_workspace,alltasks,count,indo,boolean]= [data['cards']['cards_name'],data['workspaces'],0,data['tasks'],-1,null,false];
-
             let [workspace,tasklength,lcount] = [req.body.workspace,parseInt(task.split(" ")[1]),-1];
             let arraybox=[[],[],-1,0,0];
             
@@ -375,7 +377,7 @@ connectToDatabase().then(async() => {
                 }
             });
             
-            cards_names.forEach((cardname,index) => {
+            cards_names.forEach((cardname) => {
                 if (cardname === 0) {
                     arraybox[2]++;
                 }
@@ -465,7 +467,7 @@ connectToDatabase().then(async() => {
             indo+=tasklength;
 
             indo=boolean?indo:alltasks.length
-            await collection.updateOne({[email]:{ $exists : true }},{$push:{[`${taskstring}`]:{$each:[task],$position:indo}}}) 
+            await collection.updateOne({[email]:{ $exists : true }},{$push:{[`${taskstring}`]:{$each:[task],$position:indo},[`${email}.date`]:{$each:[dates],$position:indo}}}) 
             res.json(arraybox[3])
         }
         else if(check==1){
@@ -505,6 +507,7 @@ connectToDatabase().then(async() => {
                     if (count == position[0]) {
                         if (tasks[index] == task) {
                             tasks.splice(index,1);
+                            data['date'].splice(index,1);
                             break;
                         }
                     }
@@ -526,13 +529,13 @@ connectToDatabase().then(async() => {
                     }
                 }
             });
-            // console.log(tasks)
-            // console.log(splitx)
+            
             await collection.updateOne(
                 { [email]: { $exists: true } },
                 {
                   $set: {
-                    [taskstring]: tasks
+                    [taskstring]: tasks,
+                    [`${email}.date`]: data['date']
                   }
                 }
               );
@@ -679,7 +682,7 @@ connectToDatabase().then(async() => {
             res.json({email:`${email}`,statement:`${select}`})
         }
         else{
-            let [statement,date] = [(await collection.findOne({[`${email}.store`]: { $exists: true }})),new Date()];
+            let [statement] = [(await collection.findOne({[`${email}.store`]: { $exists: true }}))];
             statement = (statement[`${email}`].store).split("\n");
             let dates = [date.getDate(),date.getMonth()+1,date.getFullYear(),date.getHours(),date.getMinutes()];
 
@@ -778,53 +781,52 @@ connectToDatabase().then(async() => {
         }
     })
 
-    app.post("/timedetector",async(req,res)=>{
-        const date = new Date();
-        let dates = [date.getDate(),date.getMonth()+1,date.getFullYear(),date.getHours(),date.getMinutes()];
-        const [email,check,name] = [(req.body.email).split("@")[0],req.body.check,req.body.name];
-        let [data,temp] = [await collection.findOne({ [email]: { $exists: true } }),0];
-        data = data[email];
-        switch (check) {
-            case 'Workspace':
+    // app.post("/timedetector",async(req,res)=>{
+    //     let dates = [date.getDate(),date.getMonth()+1,date.getFullYear(),date.getHours(),date.getMinutes()];
+    //     const [email,check,name] = [(req.body.email).split("@")[0],req.body.check,req.body.name];
+    //     let [data,temp] = [await collection.findOne({ [email]: { $exists: true } }),0];
+    //     data = data[email];
+    //     switch (check) {
+    //         case 'Workspace':
                 
-                break;
+    //             break;
             
-            case 'Card':
-                let checker = ["cards_title","cards_name","cards_desc"]
-                for (let index = 0; index < checker.length; index++) {
-                    const element = data.cards[checker[index]];
-                    for (let index1 = 0; index1 < element.length; index1++) {
-                        const element1 = element[index1];
-                        if (element1 === name) {
-                            temp = index1;
-                            break;
-                        }
-                    }
-                }
-                break;
+    //         case 'Card':
+    //             let checker = ["cards_title","cards_name","cards_desc"]
+    //             for (let index = 0; index < checker.length; index++) {
+    //                 const element = data.cards[checker[index]];
+    //                 for (let index1 = 0; index1 < element.length; index1++) {
+    //                     const element1 = element[index1];
+    //                     if (element1 === name) {
+    //                         temp = index1;
+    //                         break;
+    //                     }
+    //                 }
+    //             }
+    //             break;
 
-            case 'Task':
+    //         case 'Task':
                 
-                break;
-        }
+    //             break;
+    //     }
 
-        temp = data.date[temp];
-        temp.forEach((element,index) => {
-            dates[index] -= element; 
-            if (dates[index] < 0) {
-                dates[index] += dates[index]*(-2)
-            }
-        });
-        dates[0] = dates[0]*24
-        dates[1] = dates[1]*720
-        dates[2] = dates[2]*8640
+    //     temp = data.date[temp];
+    //     temp.forEach((element,index) => {
+    //         dates[index] -= element; 
+    //         if (dates[index] < 0) {
+    //             dates[index] += dates[index]*(-2)
+    //         }
+    //     });
+    //     dates[0] = dates[0]*24
+    //     dates[1] = dates[1]*720
+    //     dates[2] = dates[2]*8640
 
-        temp = dates[4]
-        dates = dates[0]+dates[1]+dates[2]+dates[3] 
-        temp = dates[4]==0?`${dates} Hours`:`${dates} Hours and ${temp} Minutes`
+    //     temp = dates[4]
+    //     dates = dates[0]+dates[1]+dates[2]+dates[3] 
+    //     temp = dates[4]==0?`${dates} Hours`:`${dates} Hours and ${temp} Minutes`
     
-        res.json({time:temp})
-    })
+    //     res.json({time:temp})
+    // })
 
     app.get("/loveit",(req,res)=>{
         res.json({x:"Ayanokoji",y:"Senku",z:"Lelouch",a:"Light"});
