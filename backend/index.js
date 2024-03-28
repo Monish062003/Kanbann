@@ -781,52 +781,52 @@ connectToDatabase().then(async() => {
         }
     })
 
-    // app.post("/timedetector",async(req,res)=>{
-    //     let dates = [date.getDate(),date.getMonth()+1,date.getFullYear(),date.getHours(),date.getMinutes()];
-    //     const [email,check,name] = [(req.body.email).split("@")[0],req.body.check,req.body.name];
-    //     let [data,temp] = [await collection.findOne({ [email]: { $exists: true } }),0];
-    //     data = data[email];
-    //     switch (check) {
-    //         case 'Workspace':
+    app.post("/timedetector",async(req,res)=>{
+        let dates = [date.getDate(),date.getMonth()+1,date.getFullYear(),date.getHours(),date.getMinutes()];
+        const [email,check,name] = [(req.body.email).split("@")[0],req.body.check,req.body.name];
+        let [data,temp] = [await collection.findOne({ [email]: { $exists: true } }),0];
+        data = data[email];
+        switch (check) {
+            // case 'Workspace':
                 
-    //             break;
+            //     break;
             
-    //         case 'Card':
-    //             let checker = ["cards_title","cards_name","cards_desc"]
-    //             for (let index = 0; index < checker.length; index++) {
-    //                 const element = data.cards[checker[index]];
-    //                 for (let index1 = 0; index1 < element.length; index1++) {
-    //                     const element1 = element[index1];
-    //                     if (element1 === name) {
-    //                         temp = index1;
-    //                         break;
-    //                     }
-    //                 }
-    //             }
-    //             break;
+            case 'Card':
+                let checker = ["cards_title","cards_name","cards_desc"]
+                for (let index = 0; index < checker.length; index++) {
+                    const element = data.cards[checker[index]];
+                    for (let index1 = 0; index1 < element.length; index1++) {
+                        const element1 = element[index1];
+                        if (element1 === name) {
+                            temp = index1;
+                            break;
+                        }
+                    }
+                }
+                break;
 
-    //         case 'Task':
+            // case 'Task':
                 
-    //             break;
-    //     }
+            //     break;
+        }
 
-    //     temp = data.date[temp];
-    //     temp.forEach((element,index) => {
-    //         dates[index] -= element; 
-    //         if (dates[index] < 0) {
-    //             dates[index] += dates[index]*(-2)
-    //         }
-    //     });
-    //     dates[0] = dates[0]*24
-    //     dates[1] = dates[1]*720
-    //     dates[2] = dates[2]*8640
+        temp = data.date[temp];
+        temp.forEach((element,index) => {
+            dates[index] -= element; 
+            if (dates[index] < 0) {
+                dates[index] += dates[index]*(-2)
+            }
+        });
+        dates[0] = dates[0]*24
+        dates[1] = dates[1]*720
+        dates[2] = dates[2]*8640
 
-    //     temp = dates[4]
-    //     dates = dates[0]+dates[1]+dates[2]+dates[3] 
-    //     temp = dates[4]==0?`${dates} Hours`:`${dates} Hours and ${temp} Minutes`
+        temp = dates[4]
+        dates = dates[0]+dates[1]+dates[2]+dates[3] 
+        temp = dates[4]==0?`${dates} Hours`:`${dates} Hours and ${temp} Minutes`
     
-    //     res.json({time:temp})
-    // })
+        res.json({time:temp})
+    })
 
     app.get("/loveit",(req,res)=>{
         res.json({x:"Ayanokoji",y:"Senku",z:"Lelouch",a:"Light"});
