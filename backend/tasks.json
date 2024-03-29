@@ -1,5 +1,5 @@
 {
-    "tasks": [
+    "self": [
       "Cook Food",
       "Meditate for 10 mins",
       "Call the labourer",
@@ -25,5 +25,31 @@
       "Do a DIY project",
       "Research a topic of interest",
       "Do a digital detox for an hour"
+    ],
+    "business":[
+      "Conduct market research",
+      "Define target audience and customer personas",
+      "Develop a business model canvas",
+      "Create a competitive analysis",
+      "Write a business plan outline",
+      "Identify key performance indicators (KPIs)",
+      "Set short-term and long-term goals",
+      "Draft a marketing strategy",
+      "Define branding elements (logo, colors, etc.)",
+      "Develop a product or service roadmap",
+      "Create a financial forecast",
+      "Establish a pricing strategy",
+      "Secure funding or investment",
+      "Build a minimum viable product (MVP)",
+      "Test and iterate the business concept",
+      "Develop a sales strategy and funnel",
+      "Build a website or online presence",
+      "Establish legal structure and contracts",
+      "Hire necessary staff or contractors",
+      "Implement operational processes and systems",
+      "Launch a marketing campaign",
+      "Monitor and analyze performance metrics",
+      "Gather customer feedback and iterate",
+      "Expand or scale the business as appropriate"
     ]
 }

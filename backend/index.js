@@ -671,9 +671,9 @@ connectToDatabase().then(async() => {
 
     app.post("/chatbotloader",async(req,res)=>{
         const jsondata = require('./tasks.json')
-        let [email,number,action]= [(req.body.email).split("@")[0],parseInt(req.body.num)?parseInt(req.body.num):5,parseInt(req.body.action)]
+        let [email,number,action,plan]= [(req.body.email).split("@")[0],parseInt(req.body.num)?parseInt(req.body.num):5,parseInt(req.body.action),parseInt(req.body.plan)]
         if (action == 0) {
-            let [statement,select,save] = [jsondata.tasks,``,[]]
+            let [statement,select,save] = [plan==0?jsondata.self:jsondata.business,``,[]]
             for (let index = 0; index < number; index++) {
                 save.push(checker(save,statement.length));
                 select += `${index+1}: ${statement[save[index]]}\n`
@@ -751,7 +751,7 @@ connectToDatabase().then(async() => {
                 tasks.splice(check+index+1, 0, state);
             });
 
-            await collection.updateMany({ [email]: { $exists: true } },{ $set: { [`${email}.tasks`]: tasks } });
+            await collection.updateMany({ [email]: { $exists: true } },{ $set: { [data2]: tasks } });
             await collection.updateMany({ [email]: { $exists: true } },{ $unset: { [`${email}.store`]: "" } });
             await collection.updateMany(
                 { [email]: { $exists: true } },
@@ -784,32 +784,78 @@ connectToDatabase().then(async() => {
     app.post("/timedetector",async(req,res)=>{
         let dates = [date.getDate(),date.getMonth()+1,date.getFullYear(),date.getHours(),date.getMinutes()];
         const [email,check,name] = [(req.body.email).split("@")[0],req.body.check,req.body.name];
-        let [data,temp] = [await collection.findOne({ [email]: { $exists: true } }),0];
+        let [data,temp,count,pass] = [await collection.findOne({ [email]: { $exists: true } }),0,0,1];
         data = data[email];
         switch (check) {
-            // case 'Workspace':
-                
-            //     break;
+            case 'Workspace':
+                let [wname,tasks] = [data['workspaces'],data['tasks']];
+                for (let index = 0; index < wname.length; index++) {
+                    const element = wname[index];
+                    if (element === name) {
+                        temp = index;
+                        count= -1;
+                        for (let index = 0; index < tasks.length; index++) {
+                            const task = tasks[index];
+                            if (task == 0) {
+                                count++;
+                            }
+                            if (count === temp) {
+                                temp = index;
+                                break;
+                            }
+                        }
+                        pass = 0;
+                        break;
+                    }
+                }
+
+                if (pass === 1) {
+                    return res.json({time:"Workspace name doesn't exists"})
+                }
+
+                break;
             
             case 'Card':
-                let checker = ["cards_title","cards_name","cards_desc"]
+                let checker = ["cards_title","cards_desc"]
                 for (let index = 0; index < checker.length; index++) {
                     const element = data.cards[checker[index]];
                     for (let index1 = 0; index1 < element.length; index1++) {
                         const element1 = element[index1];
+                        if (element1 === 0) {
+                            count++;
+                        }
                         if (element1 === name) {
-                            temp = index1;
+                            temp = index1 - count;
                             break;
                         }
                     }
+                    count = 0;
                 }
+                count = 0;
+
+                for (let index = 0; index < data.tasks.length; index++) {
+                    const element = data.tasks[index];
+                    if (element === 1) {
+                        count++;
+                    }
+                    if (element === temp) {
+                        temp = index;
+                        break;
+                    }
+                }
+
                 break;
 
-            // case 'Task':
-                
-            //     break;
+            case 'Task':
+                for (let index = 0; index < data.tasks.length; index++) {
+                    const task = data.tasks[index];
+                    if (task === name) {
+                        temp = index;
+                    }
+                }
+                break;
         }
-
+        let ex = data.date[temp];
         temp = data.date[temp];
         temp.forEach((element,index) => {
             dates[index] -= element; 
@@ -817,12 +863,13 @@ connectToDatabase().then(async() => {
                 dates[index] += dates[index]*(-2)
             }
         });
-        dates[0] = dates[0]*24
+
+        dates[0] = dates[0]*24-dates[3]
         dates[1] = dates[1]*720
         dates[2] = dates[2]*8640
 
         temp = dates[4]
-        dates = dates[0]+dates[1]+dates[2]+dates[3] 
+        dates = dates[0]
         temp = dates[4]==0?`${dates} Hours`:`${dates} Hours and ${temp} Minutes`
     
         res.json({time:temp})
