@@ -3,6 +3,7 @@ const app = express();
 const cors = require('cors')
 const bodyParser = require('body-parser');
 const {MongoClient} = require('mongodb');
+const axios = require('axios');
 
 app.use(express.urlencoded());
 app.use(bodyParser.json());
@@ -782,7 +783,7 @@ connectToDatabase().then(async() => {
     })
 
     app.post("/timedetector",async(req,res)=>{
-        let dates = [date.getDate(),date.getMonth()+1,date.getFullYear(),date.getHours(),date.getMinutes()];
+        let dates = [date.getDate(),date.getMonth(),date.getFullYear(),date.getHours(),date.getMinutes()];
         const [email,check,name] = [(req.body.email).split("@")[0],req.body.check,req.body.name];
         let [data,temp,count,pass] = [await collection.findOne({ [email]: { $exists: true } }),0,0,1];
         data = data[email];
@@ -855,24 +856,14 @@ connectToDatabase().then(async() => {
                 }
                 break;
         }
-        let ex = data.date[temp];
-        temp = data.date[temp];
-        temp.forEach((element,index) => {
-            dates[index] -= element; 
-            if (dates[index] < 0) {
-                dates[index] += dates[index]*(-2)
-            }
-        });
+        
+        temp = [data.date[temp][2],data.date[temp][1],data.date[temp][0],data.date[temp][3],data.date[temp][4]];
+        dates = [dates[2],dates[1]+1,dates[0],dates[3],dates[4]];
 
-        dates[0] = dates[0]*24-dates[3]
-        dates[1] = dates[1]*720
-        dates[2] = dates[2]*8640
-
-        temp = dates[4]
-        dates = dates[0]
-        temp = dates[4]==0?`${dates} Hours`:`${dates} Hours and ${temp} Minutes`
+        let response = await axios.get(`http://127.0.0.1:8000/td/${temp}/${dates}/`);
+        response = await response.data.diff
     
-        res.json({time:temp})
+        res.json({response: response})
     })
 
     app.get("/loveit",(req,res)=>{
