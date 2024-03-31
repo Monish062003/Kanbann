@@ -21,5 +21,5 @@ from . import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('td/<str:prev_date>/<str:curr_date>/',views.difftime),
-    path('tiger/<str:name>/',views.tiger),
+    path('',views.tiger),
 ]

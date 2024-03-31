@@ -1,7 +1,7 @@
 from django.http import HttpResponse,JsonResponse
 from matplotlib.backends.backend_agg import FigureCanvasAgg
 import matplotlib.pyplot as plt
-import io
+from django.shortcuts import render
 from datetime import datetime
 
 def visualize(request):
@@ -24,8 +24,8 @@ def visualize(request):
     buffer.close()
 
     return response
-def tiger(request,name):
-    return HttpResponse(f'Hello {name}')
+def tiger(request):
+    return render(request,'index.html')
 
 def difftime(request):
     if request.method == "POST":
