@@ -801,7 +801,7 @@ connectToDatabase().then(async() => {
         return {hours:hoursDifference,minutes:minutesDifference,days:daysDifference}
     }
 
-    app.post("/allpredictor",async(req,res)=>{
+    app.post('/visualize', async(req, res) => {
         let [email,check]=[(req.body.email).split("@")[0],parseInt(req.body.check)];
         let [dates,data] = [[date.getFullYear(),date.getMonth(),date.getDate(),date.getHours(),date.getMinutes()],await collection.findOne({ [email]: { $exists: true } })];
         data = data[email]
@@ -866,21 +866,11 @@ connectToDatabase().then(async() => {
         for (let index = 0; index < store.length; index++) {
             store1.push(timediff(dates,store[index],0))
         }
-        res.json({response:store1})
-    })
-
-    app.get('/visualize', (req, res) => {
-        const data = [100, 50, 90, 20, 150];
-        const labels = ['Workspace 1', 'Workspace 2', 'Workspace 3', 'Workspace 4', 'Workspace 5'];
-
-        const svgString = generateSVG(data, labels);
+        
+        const svgString = generateSVG(store1, labelnames);
     
         res.set('Content-Type', 'image/svg+xml');
-        res.json({
-            svg: svgString,
-            data: data,
-            labels: labels
-        });
+        res.send(svgString)
     });
     
     function generateSVG(data, labels) {
