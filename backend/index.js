@@ -949,8 +949,8 @@ connectToDatabase().then(async() => {
         dates = [dates[2],dates[1]+1,dates[0],dates[3],dates[4]];
 
         let response = timediff(temp,dates,1)
-    
-        res.json({response: response})
+        let checkdate = [date.getDate(),date.getMonth(),date.getFullYear(),date.getHours(),date.getMinutes()]
+        res.json({response: response,date:checkdate})
     })
 
     app.get("/loveit",(req,res)=>{
