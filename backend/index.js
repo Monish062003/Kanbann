@@ -869,7 +869,7 @@ connectToDatabase().then(async() => {
         
         const svgString = generateSVG(store1, labelnames);
         res.set('Content-Type', 'image/svg+xml');
-        res.send(svgString)
+        res.send({svg:svgString})
     });
     
     function generateSVG(data, labels) {
