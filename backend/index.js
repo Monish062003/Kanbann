@@ -798,7 +798,8 @@ connectToDatabase().then(async() => {
         if (predict === 0) {
             return daysDifference;
         }
-        return {hours:hoursDifference,minutes:minutesDifference,days:daysDifference}
+
+        return `You have spent ${daysDifference} Days, ${hoursDifference} Hours and ${minutesDifference} Minutes `
     }
 
     app.post('/visualize', async(req, res) => {
@@ -869,7 +870,7 @@ connectToDatabase().then(async() => {
         
         const svgString = generateSVG(store1, labelnames);
         res.set('Content-Type', 'image/svg+xml');
-        res.send({svg:svgString})
+        res.send(svgString)
     });
     
     function generateSVG(data, labels) {
@@ -989,7 +990,7 @@ connectToDatabase().then(async() => {
         temp = [data.date[temp][2],data.date[temp][1],data.date[temp][0],data.date[temp][3],data.date[temp][4]];
         dates = [dates[2],dates[1]+1,dates[0],dates[3],dates[4]];
 
-        let response = timediff(temp,dates,1)
+        let response = timediff(temp,dates,1)+`in ${check} : ${name}`
         let checkdate = [date.getDate(),date.getMonth(),date.getFullYear(),date.getHours(),date.getMinutes()]
         res.json({response: response,date:checkdate})
     })
