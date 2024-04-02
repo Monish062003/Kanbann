@@ -867,8 +867,8 @@ connectToDatabase().then(async() => {
             store1.push(timediff(dates,store[index],0))
         }
         
-        const svgString = generateSVG([80,20,40], labelnames);
-        // res.set('Content-Type', 'image/svg+xml');
+        const svgString = generateSVG(store1, labelnames);
+        res.set('Content-Type', 'image/svg+xml');
         res.send(svgString)
     });
     
