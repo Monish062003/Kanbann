@@ -3,7 +3,10 @@ const app = express();
 const cors = require('cors')
 const bodyParser = require('body-parser');
 const {MongoClient} = require('mongodb');
-const axios = require('axios');
+const fs = require('fs');
+const svg2img = require('svg2img');
+const {JSDOM} = require('jsdom');
+const d3 = require('d3');
 
 app.use(express.urlencoded());
 app.use(bodyParser.json());
@@ -870,6 +873,45 @@ connectToDatabase().then(async() => {
         res.json({response:store1})
     })
 
+    app.get('/visualize', (req, res) => {
+        const data = [100, 50, 90, 120, 150];
+    
+        // Create a new JSDOM instance to provide a fake DOM environment
+        const jsdom = new JSDOM();
+        const { document } = jsdom.window;
+        global.document = document;
+    
+        // Create a new SVG element using D3.js
+        const svg = d3.select(document.createElementNS('http://www.w3.org/2000/svg', 'svg'))
+            .attr("width", 400)
+            .attr("height", 200);
+    
+        svg.selectAll("rect")
+            .data(data)
+            .enter()
+            .append("rect")
+            .attr("x", (d, i) => i * 80)
+            .attr("y", d => 200 - d)
+            .attr("width", 50)
+            .attr("height", d => d)
+            .attr("fill", "steelblue");
+    
+        // Get the SVG string
+        const svgString = svg.node().outerHTML;
+    
+        // Convert SVG to PNG
+        svg2img(svgString, function(error, buffer) {
+            if (error) {
+                console.error(error);
+                return res.status(500).send('Error converting SVG to PNG');
+            }
+    
+            // Send the PNG image as a response
+            res.writeHead(200, {'Content-Type': 'image/png' });
+            res.end(buffer, 'binary');
+        });
+    });
+    
     app.post("/timedetector",async(req,res)=>{
         let dates = [date.getDate(),date.getMonth(),date.getFullYear(),date.getHours(),date.getMinutes()];
         const [email,check,name] = [(req.body.email).split("@")[0],req.body.check,req.body.name];
