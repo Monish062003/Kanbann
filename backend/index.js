@@ -789,12 +789,17 @@ connectToDatabase().then(async() => {
         if (predict === 0) {
             return difference;
         }
-        const millisecondsPerDay = 1000 * 60 * 60 * 24;
-        const daysDifference = Math.floor(difference / millisecondsPerDay);
-        const hoursDifference = Math.floor((difference % millisecondsPerDay) / (1000 * 60 * 60));
-        const minutesDifference = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
-
-        return `The difference between the two dates is: ${daysDifference} days, ${hoursDifference} hours and ${minutesDifference} minutes`
+        let millisecondsPerDay = 1000 * 60 * 60 * 24;
+        let daysDifference = Math.floor(difference / millisecondsPerDay);
+        let hoursDifference = Math.floor((difference % millisecondsPerDay) / (1000 * 60 * 60));
+        let minutesDifference = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+        let aggregation = [daysDifference,hoursDifference,minutesDifference]
+        for (let index = 0; index < aggregation.length; index++) {
+            if (aggregation[index]<0) {
+                aggregation[index]=aggregation[index]*(-2)-aggregation[index]
+            }
+        }
+        return {hours:hoursDifference,minutes:minutesDifference,days:daysDifference}
     }
 
     app.post("/allpredictor",async(req,res)=>{
