@@ -785,9 +785,6 @@ connectToDatabase().then(async() => {
         const date1 = new Date(old[0],old[1],old[2],old[3],old[4]);
         const date2 = new Date(news[0],news[1],news[2],news[3],news[4]);
         const difference = date2 - date1;
-        if (predict === 0) {
-            return difference;
-        }
         let millisecondsPerDay = 1000 * 60 * 60 * 24;
         let daysDifference = Math.floor(difference / millisecondsPerDay);
         let hoursDifference = Math.floor((difference % millisecondsPerDay) / (1000 * 60 * 60));
@@ -797,6 +794,9 @@ connectToDatabase().then(async() => {
             if (aggregation[index]<0) {
                 aggregation[index]=aggregation[index]*(-2)-aggregation[index]
             }
+        }
+        if (predict === 0) {
+            return daysDifference;
         }
         return {hours:hoursDifference,minutes:minutesDifference,days:daysDifference}
     }
@@ -868,7 +868,6 @@ connectToDatabase().then(async() => {
         }
         
         const svgString = generateSVG(store1, labelnames);
-    
         res.set('Content-Type', 'image/svg+xml');
         res.send(svgString)
     });
@@ -877,24 +876,40 @@ connectToDatabase().then(async() => {
         if (data.length !== labels.length) {
             throw new Error("Data and labels arrays must have the same length");
         }
-        
-        let svg = `<svg xmlns="http://www.w3.org/2000/svg" width="400" height="200">`;
+    
+        const maxValue = Math.max(...data);
+    
+        const svgWidth = 400;
+        const svgHeight = 200;
+        const margin = { top: 20, right: 20, bottom: 30, left: 40 };
+        const chartWidth = svgWidth - margin.left - margin.right;
+        const chartHeight = svgHeight - margin.top - margin.bottom;
+    
+        const barWidth = chartWidth / data.length;
+        const barSpacing = 10;
+    
+        let svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${svgWidth}" height="${svgHeight}">`;
+    
+        svg += `<g transform="translate(${margin.left}, ${margin.top})">`;
     
         data.forEach((d, i) => {
-            const x = i * 80;
-            const y = 200 - d;
-            const height = d;
-            svg += `<rect x="${x}" y="${y}" width="50" height="${height}" fill="steelblue" />`;
-            
-            const labelX = x + 25;
-            const labelY = y - 5; 
+            const barHeight = (d / maxValue) * chartHeight;
+    
+            const x = i * (barWidth + barSpacing);
+            const y = chartHeight - barHeight;
+    
+            svg += `<rect x="${x}" y="${y}" width="${barWidth}" height="${barHeight}" fill="steelblue" />`;
+    
+            const labelX = x + barWidth / 2;
+            const labelY = y - 5;
             svg += `<text x="${labelX}" y="${labelY}" fill="black" text-anchor="middle">${labels[i]}</text>`;
         });
-    
+        svg += `</g>`;
         svg += `</svg>`;
+    
         return svg;
     }
-    
+        
 
     app.post("/timedetector",async(req,res)=>{
         let dates = [date.getDate(),date.getMonth(),date.getFullYear(),date.getHours(),date.getMinutes()];
