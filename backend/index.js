@@ -3,14 +3,10 @@ const app = express();
 const cors = require('cors')
 const bodyParser = require('body-parser');
 const {MongoClient} = require('mongodb');
-const fs = require('fs');
-const d3n = require('d3-node');
-const path = require('path');
 
 app.use(express.urlencoded());
 app.use(bodyParser.json());
 app.use(cors())
-app.use(express.static(path.join(__dirname, 'public')));
 
 
 let [db,client,collection] = '';
@@ -27,7 +23,7 @@ async function connectToDatabase() {
 connectToDatabase().then(async() => {
     collection = db.collection('emails');
     const date = new Date();
-
+    
     app.post("/email",async(req,res)=>{
         let email = `${req.body.email}`.split('@')[0];
         let dates = req.body.dates;
@@ -874,28 +870,38 @@ connectToDatabase().then(async() => {
     })
 
     app.get('/visualize', (req, res) => {
-        const data = [100, 50, 90, 120, 150];
-        const firstNames = ['John', 'Emma', 'Michael', 'Sophia', 'William', 'Olivia', 'James', 'Amelia', 'Benjamin', 'Ava', 'Alexander', 'Isabella'];
-        const d3nInstance = new d3n();
-        const svg = d3nInstance.createSVG()
-            .attr('xmlns', 'http://www.w3.org/2000/svg')
-            .attr('width', 400)
-            .attr('height', 200);
+        const data = [100, 50, 90, 20, 150];
+        const labels = ['Workspace 1', 'Workspace 2', 'Workspace 3', 'Workspace 4', 'Workspace 5'];
 
-        const rect = svg.selectAll('rect')
-            .data(data)
-            .enter().append('rect')
-            .attr('x', (d, i) => i * 80)
-            .attr('y', d => 200 - d)
-            .attr('width', 50)
-            .attr('height', d => d)
-            .attr('fill', 'steelblue');
-        let namesave = firstNames[Math.floor(Math.random() * firstNames.length)]
-        fs.writeFileSync(`public/${namesave}.svg`, d3nInstance.svgString());
-
-        res.send({image:`https://server-gray-omega.vercel.app/${namesave}.svg`});
+        const svgString = generateSVG(data, labels);
+    
+        res.set('Content-Type', 'image/svg+xml');
+        res.send(svgString);
     });
     
+    function generateSVG(data, labels) {
+        if (data.length !== labels.length) {
+            throw new Error("Data and labels arrays must have the same length");
+        }
+        
+        let svg = `<svg xmlns="http://www.w3.org/2000/svg" width="400" height="200">`;
+    
+        data.forEach((d, i) => {
+            const x = i * 80;
+            const y = 200 - d;
+            const height = d;
+            svg += `<rect x="${x}" y="${y}" width="50" height="${height}" fill="steelblue" />`;
+            
+            const labelX = x + 25;
+            const labelY = y - 5; 
+            svg += `<text x="${labelX}" y="${labelY}" fill="black" text-anchor="middle">${labels[i]}</text>`;
+        });
+    
+        svg += `</svg>`;
+        return svg;
+    }
+    
+
     app.post("/timedetector",async(req,res)=>{
         let dates = [date.getDate(),date.getMonth(),date.getFullYear(),date.getHours(),date.getMinutes()];
         const [email,check,name] = [(req.body.email).split("@")[0],req.body.check,req.body.name];
@@ -989,6 +995,6 @@ connectToDatabase().then(async() => {
     })
 
     app.listen(80, () => {
-        console.log("Listen to: http://localhost:80");
+        console.log("Listen to: http://localhost:80/");
     });
 })
