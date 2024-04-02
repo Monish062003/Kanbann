@@ -5,10 +5,6 @@ const bodyParser = require('body-parser');
 const {MongoClient} = require('mongodb');
 const fs = require('fs');
 const d3n = require('d3-node');
-let d3 = 0;
-async()=>{
-    d3 = await require('d3');
-}
 const path = require('path');
 
 app.use(express.urlencoded());
