@@ -42,7 +42,7 @@ connectToDatabase().then(async() => {
                     'cards_title':[0,'Card Title'],
                     },
                     'tasks':[0,1,'Sip a Coffee'],
-                    'date':[0,dates],
+                    'date':[dates,dates,dates],
                     'current':'Workspace 1'
                 }
             })
@@ -782,6 +782,89 @@ connectToDatabase().then(async() => {
         }
     })
 
+    function timediff(old,news,predict) {
+        const date1 = new Date(old[0],old[1],old[2],old[3],old[4]);
+        const date2 = new Date(news[0],news[1],news[2],news[3],news[4]);
+        const difference = date2 - date1;
+        if (predict === 0) {
+            return difference;
+        }
+        const millisecondsPerDay = 1000 * 60 * 60 * 24;
+        const daysDifference = Math.floor(difference / millisecondsPerDay);
+        const hoursDifference = Math.floor((difference % millisecondsPerDay) / (1000 * 60 * 60));
+        const minutesDifference = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+
+        return `The difference between the two dates is: ${daysDifference} days, ${hoursDifference} hours and ${minutesDifference} minutes`
+    }
+
+    app.post("/allpredictor",async(req,res)=>{
+        let [email,check]=[(req.body.email).split("@")[0],parseInt(req.body.check)];
+        let [dates,data] = [[date.getFullYear(),date.getMonth(),date.getDate(),date.getHours(),date.getMinutes()],await collection.findOne({ [email]: { $exists: true } })];
+        data = data[email]
+        let [store,store1,labelnames] = [[],[],[]];
+        switch (check) {
+            case 0:
+                data.tasks.forEach((task,index) => {
+                    if (task === 0) {
+                       labelnames = data.workspaces;
+                       store.push([data.date[index][2],data.date[index][1],data.date[index][0],data.date[index][3],data.date[index][4]]);
+                    }
+                });
+                break;
+
+            case 1:
+                data.cards.cards_title.forEach(ctitle => {
+                    if (ctitle != 0) {
+                        labelnames.push(ctitle);
+                    }
+                });
+                data.tasks.forEach((task,index) => {
+                    if (task === 1) {
+                        try {
+                            store.push([data.date[index][2],data.date[index][1],data.date[index][0],data.date[index][3],data.date[index][4]]);   
+                        } catch (error) {
+                            
+                        }
+                    }
+                });
+                break;
+
+            case 2:
+                data.tasks.forEach((task,index) => {
+                    if (task != 0 && task != 1) {
+                        try {
+                            labelnames.push(task);
+                            store.push([data.date[index][2],data.date[index][1],data.date[index][0],data.date[index][3],data.date[index][4]]);
+                        } catch (error) {
+                            
+                        }
+                    }
+                });
+                break;
+
+            case 3:
+                // let [worksp,cardsp]=[data.workspaces,[]]
+                // data.cards.cards_title.forEach(ctitle => {
+                //     if (ctitle != 0) {
+                //         cardsp.push(ctitle);
+                //     }
+                // });
+                // data.tasks.forEach((task,index) => {
+                //     try {
+                        
+                //         store.push([data.date[index][2],data.date[index][1],data.date[index][0],data.date[index][3],data.date[index][4]]);
+                //     } catch (error) {
+                        
+                //     }
+                // });
+                break;
+        }
+        for (let index = 0; index < store.length; index++) {
+            store1.push(timediff(dates,store[index],0))
+        }
+        res.json({response:store1})
+    })
+
     app.post("/timedetector",async(req,res)=>{
         let dates = [date.getDate(),date.getMonth(),date.getFullYear(),date.getHours(),date.getMinutes()];
         const [email,check,name] = [(req.body.email).split("@")[0],req.body.check,req.body.name];
@@ -860,8 +943,7 @@ connectToDatabase().then(async() => {
         temp = [data.date[temp][2],data.date[temp][1],data.date[temp][0],data.date[temp][3],data.date[temp][4]];
         dates = [dates[2],dates[1]+1,dates[0],dates[3],dates[4]];
 
-        let response = await axios.get(`http://127.0.0.1:8000/td/${temp}/${dates}/`);
-        response = await response.data.diff
+        let response = timediff(temp,dates,1)
     
         res.json({response: response})
     })
