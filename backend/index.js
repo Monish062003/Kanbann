@@ -868,7 +868,7 @@ connectToDatabase().then(async() => {
         }
         
         const svgString = generateSVG([80,20,40], labelnames);
-        res.set('Content-Type', 'image/svg+xml');
+        // res.set('Content-Type', 'image/svg+xml');
         res.send(svgString)
     });
     
