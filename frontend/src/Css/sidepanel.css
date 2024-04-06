@@ -38,6 +38,32 @@
     background-color: rgba(96, 89, 89, 0.66);
 }
 
+.create-group,.join-group{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: auto;
+    height: 5.5vh;
+    text-wrap: nowrap;
+    border-bottom: 1px solid white;
+    gap: 10px;
+    color: #FFF;
+    font-family: Roboto;
+    font-size: 1.175rem;
+    font-style: normal;
+    font-weight: 500;
+    line-height: normal;
+}
+
+.create-group:hover,.join-group:hover{
+    cursor: pointer;
+    background-color: rgba(146, 135, 131, 0.5);
+}
+
+.create-group{
+    border-top: 1px solid white;
+}
+
 
 @keyframes opaquetext {
     from{
@@ -102,7 +128,7 @@
 }
 
 .workspacehandler{
-    height: 76vh;
+    height: 53vh;
     overflow-y: scroll;
 }
 
@@ -169,7 +195,7 @@
     color: #FFF;
     font-family: Roboto;
     gap: 10px;
-    font-size: 1.375rem;
+    font-size: 1.2rem;
     font-style: normal;
     font-weight: 500;
     line-height: normal;
@@ -185,9 +211,24 @@
     height: 1.375rem;
     font-size: 1.75rem;
     background-color: transparent;
+    margin-bottom: 1.75vh;
     border: 0px none;
     color: white;
-    margin-bottom: 1.5vh;
+}
+
+.workspace-group button i{
+    rotate: 270deg;
+}
+
+
+.rotatetoninty{
+    transform: rotate(90deg);
+    transition: transform 0.5s ease;
+}
+
+.rotatetonifty{
+    transform: rotate(0deg);
+    transition: transform 0.5s ease;
 }
 
 .workspaceheading{

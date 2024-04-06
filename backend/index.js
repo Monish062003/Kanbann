@@ -52,6 +52,35 @@ connectToDatabase().then(async() => {
         }
     })
 
+    app.post("/groupmail",async(req,res)=>{
+        let [email,groupcode,workspacename] = [`${req.body.email}`.split('@')[0],req.body.groupcode,req.body.workspacename];
+        let dates = req.body.dates;
+        let data = await collection.findOne({[groupcode]:{ $exists : true }});
+        if (data==null) {
+            let acknowledgement = await collection.insertOne(
+            {
+                [groupcode]:
+                {
+                    'workspaces':[workspacename],
+                    'cards':
+                    {
+                    'cards_name':[0,'Card 1'],
+                    'cards_desc':[0,'Card Description'],
+                    'cards_title':[0,'Card Title'],
+                    },
+                    'tasks':[0,1,'Sip a Coffee'],
+                    'date':[dates,dates,dates],
+                    'current':'Workspace 1',
+                    'users':[email]
+                }
+            })
+            res.json({acknowledgement : acknowledgement.insertedId})
+        }
+        else{
+            res.json(data[`${email}`])
+        }
+    })
+
     app.post("/workspace",async(req,res)=>{
         let [email,workspace,check] = [`${req.body.email}`.split('@')[0],req.body.workspacename,req.body.check];
         let data = email + ".workspaces";

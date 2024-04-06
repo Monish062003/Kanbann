@@ -1,13 +1,20 @@
-import React,{useEffect,useState} from 'react'
+import React,{useEffect,useState,useRef} from 'react'
 import '../Css/sidepanel.css'
 import Sideswift from '../Images/downarrow.png'
 import axios from "axios"
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import Group from './Group'
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { Bounce } from 'react-toastify';
+import 'animate.css';
 
 function Sidepanel(props) {
   let iterations=2
   let count=0;
   let refreshstopper=0;
-  
+  const[group,showgroup]=useState(false)
+
   useEffect(()=>{
     iterations=2;
     if (refreshstopper == 0) {
@@ -23,7 +30,7 @@ function Sidepanel(props) {
     refreshstopper++;
   },[props.data])
   
-  let transit=(()=>{
+  const transit=(()=>{
     let wholecontainer=document.querySelector(".side-container");
     let directbutton=document.querySelector(".sidedirect-button");
     let workspacegroup=document.querySelector(".workspace-group");
@@ -66,12 +73,12 @@ function Sidepanel(props) {
     iterations++;
   })
 
-  let remove=(async(e)=>{
+  const remove=(async(e)=>{
     if (e.target.tagName=="BUTTON") {
       count--;
       let title=e.target.parentElement.children[0].innerHTML?e.target.parentElement.children[0].innerHTML:e.target.parentElement.children[0].name;
 
-      axios.post("https://server-gray-omega.vercel.app/workspace",{
+      axios.post("http://localhost:80/workspace",{
         email:document.cookie.split("=")[1],
         workspacename:title,
         check:1,
@@ -95,7 +102,7 @@ function Sidepanel(props) {
     }
   });
   
-  let savetype = async(e) =>{
+  const savetype = async(e) =>{
     if (e.keyCode==13) {
       if (e.target.tagName=="INPUT") { 
         let title=e.target.value;
@@ -105,7 +112,7 @@ function Sidepanel(props) {
         workspace_name.remove();         
         let workspace_newname=document.createElement('div');
 
-        axios.post("https://server-gray-omega.vercel.app/workspace",{
+        axios.post("http://localhost:80/workspace",{
           email:document.cookie.split("=")[1],
           check:2,
           workspace_new:title,
@@ -119,7 +126,7 @@ function Sidepanel(props) {
       }
     }
   }
-  let edit=(async(e)=>{
+  const edit=(async(e)=>{
     if (e.target.tagName==="DIV") {
       let textbox = document.createElement('input');
       let workspace_name=e.target;
@@ -133,7 +140,7 @@ function Sidepanel(props) {
     }
   });
   
-  let changecardspanel=(async(event)=>{
+  const changecardspanel=(async(event)=>{
     try {
       if (event.target.tagName=="DIV") {
         let elements = document.getElementsByClassName(event.target.className);
@@ -174,36 +181,70 @@ function Sidepanel(props) {
     workspacetab.appendChild(button);
   }
   
-  let add=(async()=>{
-    let workspacetab=document.createElement('div');
-    let text=document.createElement('div');
-    let button=document.createElement('button');
-    let container=document.getElementsByClassName('workspacehandler')[0];
-    
-    count++;
-    workspacetab.classList.add('workspace-group');
-    text.name=`Workspace ${count}`;
-    text.addEventListener('dblclick',edit);
-    text.innerHTML = `Workspace ${count}`
-    button.innerHTML=" -";
-    
-    button.classList.add('.workspace-group');
-    button.classList.add('button');
-    button.addEventListener('click',remove);
-    
-    workspacetab.addEventListener('click',changecardspanel);
-    container.appendChild(workspacetab);
-    workspacetab.appendChild(text);
-    workspacetab.appendChild(button);
+  const add=(async()=>{
+    if (document.cookie.split("=")[1]) {
+      let workspacetab=document.createElement('div');
+      let text=document.createElement('div');
+      let button=document.createElement('button');
+      let container=document.getElementsByClassName('workspacehandler')[0];
+      
+      count++;
+      workspacetab.classList.add('workspace-group');
+      text.name=`Workspace ${count}`;
+      text.addEventListener('dblclick',edit);
+      text.innerHTML = `Workspace ${count}`
+      button.innerHTML=" -";
+      
+      button.classList.add('.workspace-group');
+      button.classList.add('button');
+      button.addEventListener('click',remove);
+      
+      workspacetab.addEventListener('click',changecardspanel);
+      container.appendChild(workspacetab);
+      workspacetab.appendChild(text);
+      workspacetab.appendChild(button);
 
-    axios.post("https://server-gray-omega.vercel.app/workspace",{
-      email:document.cookie.split("=")[1],
-      workspacename:text.innerHTML,
-      check:0,
-    })
-
-    // props.sender(true);
+      axios.post("http://localhost:80/workspace",{
+        email:document.cookie.split("=")[1],
+        workspacename:text.innerHTML,
+        check:0,
+      })
+    }
+    else{
+      toast.warn('Please Login to your Account')
+    }
   });
+
+  const create_group = () =>{
+    if (document.cookie.split("=")[1]) {
+      showgroup(true)
+    }
+    else{
+      toast.warn('Please Login to your Account')
+    }
+  }
+
+  const join_group = () =>{
+    if (document.cookie.split("=")[1]) {
+      
+    }
+    else{
+      toast.warn('Please Login to your Account')
+    }
+  }
+
+
+  const call_individuals = (event) =>{
+    let targeted = event.target;
+    targeted.classList.toggle("rotatetoninty");
+    targeted.classList.toggle("rotatetonifty");
+  }
+
+  const call_groups = (event) =>{
+    let targeted = event.target;
+    targeted.classList.toggle("rotatetoninty");
+    targeted.classList.toggle("rotatetonifty");
+  }
 
   return (
     <div className='side-container'>
@@ -212,8 +253,28 @@ function Sidepanel(props) {
           <img src={Sideswift} alt="downarrow" />
         </button>
       </div>
-      <div className="workspace-group">Add a Workspace &nbsp;&nbsp;&nbsp;<button onClick={add}>+</button></div>
+      <div className="workspace-group">Individual &nbsp;&nbsp;<button onClick={(e)=>{call_individuals(e)}}><i className="fa-solid fa-caret-down fa-sm rotatetonifty" style={{"color": "#ffffff"}}></i></button></div>
+      <div className="workspace-group">Group &nbsp;&nbsp;<button onClick={(e)=>{call_groups(e)}}><i className="fa-solid fa-caret-down fa-sm rotatetonifty" style={{"color": "#ffffff"}}></i></button></div>
       <div className="workspacehandler"></div>
+      <div className="workspace-group" style={{"borderTop":"1px solid white","borderBottom":"none"}}>Add a Workspace &nbsp;&nbsp;&nbsp;<button onClick={add}>+</button></div>
+      <div className="group-panel">
+        <div className="create-group" onClick={create_group}>Create a Group <i className="fa-solid fa-user-group fa-sm"></i></div>
+        <div className="join-group" onClick={join_group}>Join a Group <i className="fa-solid fa-users fa-sm"></i></div>
+      </div>
+      {group && <Group boarddisplay={showgroup} edit={edit} remove={remove} changecardspanel={changecardspanel} />}
+      <ToastContainer
+        position="top-center"
+        autoClose={1500}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss={false}
+        draggable
+        pauseOnHover
+        theme="dark"
+        transition= {Bounce}
+      />
     </div>
   )
 }

@@ -1,0 +1,74 @@
+.all{
+    background-color: rgba(109, 107, 105, 0.274);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    bottom: 0vh;
+    width: 100vw;
+    height: 100vh;
+}
+
+.grouppanel{
+    width: 40vw;
+    height: 40vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: rgb(32, 30, 30);
+    border: 2px solid white;
+    padding: 2vh 2vw;
+    border-radius: 12px;
+}
+
+.grouppanel h2,.grouppanel h3{
+    margin-right: auto;
+    font-size: 1.2rem;
+    color: white;
+}
+
+.grouppanel h3{
+    font-size: 1rem;
+}
+
+.grouppanel button{
+    width: max-content;
+}
+
+.grouppanel .input-group{
+    margin-right: auto;
+    width: 35vw;
+}
+
+.grouppanel .createg_title{
+    width: 35.5vw;
+    height: max-content;
+    display: flex;
+    justify-content: end;
+    align-items: center;
+}
+
+.createg_title .fa-regular{
+    cursor: pointer;
+    /* position: relative;
+    left: 1vw; */
+}
+
+.grouppanel .clipboard {
+    width: max-content;
+    height: max-content;
+    margin-top: 7vh;
+    display: flex;
+    flex-direction: row;
+    text-align: center;
+    gap: 1vw;
+}
+
+.clipboard {
+    cursor: pointer;
+}
+
+.clipboard h3{
+    position: relative;
+    bottom: 1.5vh;
+}

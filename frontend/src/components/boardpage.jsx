@@ -4,10 +4,12 @@ import Navbar from './Navbar.jsx';
 import Cardspanel from './cardpanel';
 import Sidepanel from './sidepanel';
 import axios from "axios"
+import { ToastContainer, toast } from 'react-toastify';
+import { Slide } from 'react-toastify';
 
 async function fetchWorkspaceData() {
   if (document.cookie.split("=")[1]!=undefined) {
-    const response = axios.post("https://server-gray-omega.vercel.app/email",{
+    const response = axios.post("http://localhost:80/email",{
       "email": `${document.cookie.split("=")[1]}`,
     })
 
@@ -56,6 +58,19 @@ function Boardpage() {
         {memoizedSidepanel}
         <Cardspanel data={data.cards} taskdata={data.tasks} current_workspace={workspace_active} receiver={cards_add} sender={set_card}/>
       </div>
+        <ToastContainer
+          position="top-center"
+          autoClose={1500}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="light"
+          transition= {Slide}
+        />
     </div>
   );
 }
