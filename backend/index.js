@@ -1089,38 +1089,44 @@ connectToDatabase().then(async() => {
             throw new Error("Data and labels arrays must have the same length");
         }
     
-        const maxValue = Math.max(...data);
+        const maxValue = Math.max(...data.flat());
     
-        const svgWidth = 150;
+        const svgWidth = 200;
         const svgHeight = 150;
-        const margin = { top: 20, right: 20, bottom: 30, left: 40 };
+        const margin = { top: 20, right: 20, bottom: 20, left: 20 };
         const chartWidth = svgWidth - margin.left - margin.right;
         const chartHeight = svgHeight - margin.top - margin.bottom;
     
-        const barWidth = chartWidth / data.length;
-        const barSpacing = 10;
+        const maxBars = data[0].length;
+        const barWidth = chartWidth / (data.length * maxBars);
+        const barSpacing = 2;
+        const groupSpacing = 10;
     
         let svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${svgWidth}" height="${svgHeight}">`;
     
         svg += `<g transform="translate(${margin.left}, ${margin.top})">`;
     
-        data.forEach((d, i) => {
-            const barHeight = (d / maxValue) * chartHeight;
+        data.forEach((group, i) => {
+            const groupX = i * (barWidth * maxBars + barSpacing * (maxBars - 1) + groupSpacing);
+            group.forEach((d, j) => {
+                const barHeight = (d / maxValue) * chartHeight;
+                const x = groupX + j * (barWidth + barSpacing);
+                const y = chartHeight - barHeight;
     
-            const x = i * (barWidth + barSpacing);
-            const y = chartHeight - barHeight;
+                svg += `<rect x="${x}" y="${y}" width="${barWidth}" height="${barHeight}" fill="steelblue" />`;
     
-            svg += `<rect x="${x}" y="${y}" width="${barWidth}" height="${barHeight}" fill="steelblue" />`;
-    
-            const labelX = x + barWidth / 2;
-            const labelY = y - 5;
-            svg += `<text x="${labelX}" y="${labelY}" fill="black" text-anchor="middle">${labels[i]}</text>`;
+                const labelX = x + barWidth / 2;
+                const labelY = y - 5;
+                svg += `<text x="${labelX}" y="${labelY}" fill="black" text-anchor="middle">${labels[i][j]}</text>`;
+            });
         });
+    
         svg += `</g>`;
         svg += `</svg>`;
     
         return svg;
     }
+    
     
     app.post("/timedetector",async(req,res)=>{
         let dates = [date.getDate(),date.getMonth(),date.getFullYear(),date.getHours(),date.getMinutes()];
