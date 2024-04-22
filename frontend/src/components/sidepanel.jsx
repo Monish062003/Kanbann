@@ -89,7 +89,7 @@ function Sidepanel(props) {
       count--;
       let title=e.target.parentElement.children[0].innerHTML?e.target.parentElement.children[0].innerHTML:e.target.parentElement.children[0].name;
 
-      axios.post("http://localhost:80/workspace",{
+      axios.post("https://server-gray-omega.vercel.app/workspace",{
         email:document.cookie.split("=")[1],
         name:document.cookie.split("=")[0],
         workspacename:title,
@@ -124,7 +124,7 @@ function Sidepanel(props) {
         workspace_name.remove();         
         let workspace_newname=document.createElement('div');
 
-        axios.post("http://localhost:80/workspace",{
+        axios.post("https://server-gray-omega.vercel.app/workspace",{
           email:document.cookie.split("=")[1],
           check:2,
           workspace_new:title,
@@ -219,7 +219,7 @@ function Sidepanel(props) {
       workspacetab.appendChild(text);
       workspacetab.appendChild(button);
 
-      axios.post("http://localhost:80/workspace",{
+      axios.post("https://server-gray-omega.vercel.app/workspace",{
         email:document.cookie.split("=")[1],
         workspacename:text.innerHTML,
         check:0,

@@ -42,7 +42,7 @@ export default function Group(props) {
       workspacetab.appendChild(text);
       workspacetab.appendChild(button);
 
-      await axios.post('http://localhost:80/groupmail',{
+      await axios.post('https://server-gray-omega.vercel.app/groupmail',{
         email:(document.cookie).split("=")[1],
         name:(document.cookie).split("=")[0],
         groupcode:random,

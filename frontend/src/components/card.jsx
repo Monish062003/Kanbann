@@ -10,7 +10,7 @@ export default function Card(props) {
     let changestate= props.changestate;
     let carry=0;
 
-    let data = axios.post("http://localhost:80/readworkspace",{
+    let data = axios.post("https://server-gray-omega.vercel.app/readworkspace",{
       email: document.cookie.split("=")[1],
       workspace:props.current_workspace,
       check:1
@@ -39,7 +39,7 @@ export default function Card(props) {
     }
     changestate([...cardsarray])      
     
-    axios.post("http://localhost:80/card",{
+    axios.post("https://server-gray-omega.vercel.app/card",{
       email: document.cookie.split("=")[1],
       active_workspace: props.current_workspace,
       cardname: props.name,
@@ -71,7 +71,7 @@ export default function Card(props) {
     }, [props.tasks])
     
     let AddTask=(async()=>{
-      let tdata = axios.post("http://localhost:80/task",{
+      let tdata = axios.post("https://server-gray-omega.vercel.app/task",{
         email:document.cookie.split("=")[1],
         card_name:props.name,
         task: `Task ${tasks.length+1}`,
@@ -99,7 +99,7 @@ export default function Card(props) {
           locate = 2;
         }
         
-        axios.post("http://localhost:80/card",{
+        axios.post("https://server-gray-omega.vercel.app/card",{
           email:document.cookie.split("=")[1],
           change: newtitle,
           cardname: event.target.parentElement.parentElement.getAttribute('name'),
