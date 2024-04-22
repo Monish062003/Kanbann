@@ -942,7 +942,6 @@ connectToDatabase().then(async() => {
             
             check=0;
             count=0;
-            
             for (let iindex = 0; iindex < datas['tasks'].length; iindex++) {
                 const element = datas['tasks'][iindex];
                 if (element === 0) {
@@ -952,17 +951,21 @@ connectToDatabase().then(async() => {
                     check++;
                 }
             }
-
+            
+            let datee = datas['date']
             let tasks = datas['tasks']
             statement.forEach(async(state,index) => {
                 state = state.split(`${index+1}: `)[1]
                 if (index == 0) {
                     tasks.splice(check, 0, 1);    
+                    datee.splice(dates,0,1);
                 }
                 tasks.splice(check+index+1, 0, state);
+                datee.splice(dates,0,state);
             });
-
+            console.log(datee)
             await collection.updateMany({ [email]: { $exists: true } },{ $set: { [data2]: tasks } });
+            await collection.updateMany({ [email]: { $exists: true } },{ $set: { [cdate]: datee } });
             await collection.updateMany({ [email]: { $exists: true } },{ $unset: { [`${email}.store`]: "" } });
             await collection.updateMany(
                 { [email]: { $exists: true } },
@@ -979,10 +982,6 @@ connectToDatabase().then(async() => {
                     [cdesc]: {
                       $each: ['Your Schedule'],
                       $position: venom,
-                    },
-                    [cdate] : {
-                        $each : [dates],
-                        $position : venom
                     }  
                   }
                 }
@@ -1089,7 +1088,7 @@ connectToDatabase().then(async() => {
             throw new Error("Data and labels arrays must have the same length");
         }
     
-        const maxValue = Math.max(...data.flat());
+        const maxValue = Math.max(...data);
     
         const svgWidth = 200;
         const svgHeight = 150;
@@ -1097,36 +1096,30 @@ connectToDatabase().then(async() => {
         const chartWidth = svgWidth - margin.left - margin.right;
         const chartHeight = svgHeight - margin.top - margin.bottom;
     
-        const maxBars = data[0].length;
-        const barWidth = chartWidth / (data.length * maxBars);
-        const barSpacing = 2;
-        const groupSpacing = 10;
+        const barWidth = chartWidth / data.length;
+        const barSpacing = 10;
     
         let svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${svgWidth}" height="${svgHeight}">`;
     
         svg += `<g transform="translate(${margin.left}, ${margin.top})">`;
     
-        data.forEach((group, i) => {
-            const groupX = i * (barWidth * maxBars + barSpacing * (maxBars - 1) + groupSpacing);
-            group.forEach((d, j) => {
-                const barHeight = (d / maxValue) * chartHeight;
-                const x = groupX + j * (barWidth + barSpacing);
-                const y = chartHeight - barHeight;
+        data.forEach((d, i) => {
+            const barHeight = (d / maxValue) * chartHeight;
     
-                svg += `<rect x="${x}" y="${y}" width="${barWidth}" height="${barHeight}" fill="steelblue" />`;
+            const x = i * (barWidth + barSpacing);
+            const y = chartHeight - barHeight;
     
-                const labelX = x + barWidth / 2;
-                const labelY = y - 5;
-                svg += `<text x="${labelX}" y="${labelY}" fill="black" text-anchor="middle">${labels[i][j]}</text>`;
-            });
+            svg += `<rect x="${x}" y="${y}" width="${barWidth}" height="${barHeight}" fill="steelblue" />`;
+    
+            const labelX = x + barWidth / 2;
+            const labelY = y - 5;
+            svg += `<text x="${labelX}" y="${labelY}" fill="black" text-anchor="middle">${labels[i]}</text>`;
         });
-    
         svg += `</g>`;
         svg += `</svg>`;
     
         return svg;
     }
-    
     
     app.post("/timedetector",async(req,res)=>{
         let dates = [date.getDate(),date.getMonth(),date.getFullYear(),date.getHours(),date.getMinutes()];
