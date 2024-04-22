@@ -25,8 +25,8 @@ export default function Group(props) {
       let workspacetab=document.createElement('div');
       let text=document.createElement('div');
       let button=document.createElement('button');
-      let container=document.getElementsByClassName('workspacehandler')[0];
-      
+      let container=document.getElementsByClassName('workspacehandler')[1];
+
       workspacetab.classList.add('workspace-group');
       text.name=display.txtval;
       text.addEventListener('dblclick',props.edit);
@@ -42,8 +42,9 @@ export default function Group(props) {
       workspacetab.appendChild(text);
       workspacetab.appendChild(button);
 
-      await axios.post('http://localhost:80/groupmail',{
+      await axios.post('https://server-gray-omega.vercel.app/groupmail',{
         email:(document.cookie).split("=")[1],
+        name:(document.cookie).split("=")[0],
         groupcode:random,
         workspacename:display.txtval,
         "dates": dates,

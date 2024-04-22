@@ -26,14 +26,14 @@ function Cardpanel(props) {
     (async()=>{
       if (props.current_workspace!=null) {
         let cardsArray=[];
-        let getcardsinfo = axios.post("http://localhost:80/readworkspace",{
+        let getcardsinfo = axios.post("https://server-gray-omega.vercel.app/readworkspace",{
           "email": document.cookie.split("=")[1],
           "workspace":props.current_workspace,
           "check":1
         })
         let newdata = await getcardsinfo;
-        newdata = newdata['data']
-
+        const section =  newdata['data'].section
+        newdata = newdata['data'].arrays
         let finalindex= newdata.length/4;
         if (finalindex != undefined) {
           let [figure,carry] = [[0],0]
@@ -42,7 +42,7 @@ function Cardpanel(props) {
               carry+=newdata[[index+3*finalindex]-1].length
               figure.push(carry)
             }
-            cardsArray.push(<Card name={newdata[index]} title={newdata[index+finalindex]} desc={newdata[index+2*finalindex]} tasks={newdata[index+3*finalindex]} beforetaskslength={figure[index]} usingstate={cards} changestate={setCards} arrange={index} current_workspace={props.current_workspace}/>)
+            cardsArray.push(<Card name={newdata[index]} title={newdata[index+finalindex]} desc={newdata[index+2*finalindex]} tasks={newdata[index+3*finalindex]} beforetaskslength={figure[index]} usingstate={cards} changestate={setCards} arrange={index} current_workspace={props.current_workspace} section = {section} />)
           }
           setCards([...cardsArray]);
         }
@@ -70,7 +70,7 @@ function Cardpanel(props) {
       }
       setCount(count + 1);
       document.cookie=`count=${count} ; expires=Fri, 31 Dec 9999 23:59:59 GMT; path="/"`
-      let response = await axios.post("http://localhost:80/card",{
+      let response = await axios.post("https://server-gray-omega.vercel.app/card",{
         email:document.cookie.split("=")[1],
         active_workspace:props.current_workspace,
         cardtitle: 'Card Title',

@@ -46,6 +46,7 @@
 .cdatapanel .form-control{
     font-weight: bold;
     height: 4.5vh;
+    font-size: 1rem;
 }
 
 .card-container .addcardbtn:hover {
@@ -319,7 +320,7 @@
     }
 
     .card{
-        ---cardwidth:44vw;
+        ---cardwidth:50vw;
     }
 
     .cardtitle img{

@@ -3,13 +3,18 @@ const app = express();
 const cors = require('cors')
 const bodyParser = require('body-parser');
 const {MongoClient} = require('mongodb');
+const { ChartJSNodeCanvas } = require('chartjs-node-canvas');
+const { Promise } = require('mongoose');
 
 app.use(express.urlencoded());
 app.use(bodyParser.json());
 app.use(cors())
+const canvasRenderService = new ChartJSNodeCanvas({ width: 400, height: 400 });
 
 
-let [db,client,collection] = '';
+
+
+let [db,client,collection,collection1] = '';
 async function connectToDatabase() {
     try {
         client = await MongoClient.connect('mongodb+srv://Monish:mmonish875@cluster0.7pfxpj7.mongodb.net/', { useNewUrlParser: true, useUnifiedTopology: true });
@@ -22,12 +27,14 @@ async function connectToDatabase() {
 
 connectToDatabase().then(async() => {
     collection = db.collection('emails');
+    collection1 = db.collection('groups');
     const date = new Date();
     
     app.post("/email",async(req,res)=>{
         let email = `${req.body.email}`.split('@')[0];
         let dates = req.body.dates;
         let data = await collection.findOne({[email]:{ $exists : true }});
+
         if (data==null) {
             let acknowledgement = await collection.insertOne(
             {
@@ -42,22 +49,35 @@ connectToDatabase().then(async() => {
                     },
                     'tasks':[0,1,'Sip a Coffee'],
                     'date':[dates,dates,dates],
-                    'current':'Workspace 1'
+                    'current':'Workspace 1',
+                    'groups' : []
                 }
             })
             res.json({acknowledgement : acknowledgement.insertedId})
         }
         else{
-            res.json(data[`${email}`])
+            let groups = data[`${email}`]['groups'];
+            let gdata = [];
+            try {
+                for (let index = 0; index < groups.length; index++) {
+                    const grp = groups[index];
+                    let tempdata = await collection1.findOne({ [grp]: { $exists: true } });
+                    gdata.push(tempdata[grp]);
+                }
+                gdata = await gdata;
+            } catch (error) {
+                
+            }    
+            res.json({individual:data[`${email}`],group:gdata})
         }
     })
 
     app.post("/groupmail",async(req,res)=>{
-        let [email,groupcode,workspacename] = [`${req.body.email}`.split('@')[0],req.body.groupcode,req.body.workspacename];
-        let dates = req.body.dates;
-        let data = await collection.findOne({[groupcode]:{ $exists : true }});
+        let [email,name,groupcode,workspacename] = [`${req.body.email}`.split("@")[0],req.body.name,req.body.groupcode,req.body.workspacename];
+        let [dates,estring] = [req.body.dates,`${email}.groups`];
+        let data = await collection1.findOne({[groupcode]:{ $exists : true }});
         if (data==null) {
-            let acknowledgement = await collection.insertOne(
+            let acknowledgement = await collection1.insertOne(
             {
                 [groupcode]:
                 {
@@ -71,13 +91,31 @@ connectToDatabase().then(async() => {
                     'tasks':[0,1,'Sip a Coffee'],
                     'date':[dates,dates,dates],
                     'current':'Workspace 1',
-                    'users':[email]
+                    'users':[name]
                 }
             })
+            collection.updateOne(
+                { [email]: { $exists: true } }, 
+                { $push: { [estring]: groupcode } }
+            )     
             res.json({acknowledgement : acknowledgement.insertedId})
         }
         else{
-            res.json(data[`${email}`])
+            res.json(data[`${name}`])
+        }
+    })
+
+    app.post("/handlegroup",async(req,res)=>{
+        let [email,name,code,partition]=[`${req.body.email}`.split("@")[0],req.body.name,req.body.code,parseInt(req.body.partition)]
+        let search = await collection1.findOne({[code]:{ $exists : true }})
+        if (partition === 0) {
+            res.json(search)
+        }
+        else{
+            let [gstring,istring]=[`${code}.users`,`${email}.groups`];
+            collection1.updateOne({[code]: { $exists: true }},{ $push: { [gstring]: name } });
+            collection.updateOne({[email]: { $exists: true } },{ $push:{[istring]: code }}) 
+            res.json(search)
         }
     })
 
@@ -108,7 +146,9 @@ connectToDatabase().then(async() => {
             let alldata = await collection.findOne(
                 {[email]:{ $exists : true }}
             );
-            let [cards_name,cards_desc,cards_title,tasks,cdates]=[alldata[`${email}`]['cards']['cards_name'],alldata[`${email}`]['cards']['cards_desc'],alldata[`${email}`]['cards']['cards_title'],alldata[`${email}`]['tasks'],alldata[`${email}`]['date']]
+
+
+            let [cards_name,cards_desc,cards_title,tasks,cdates,name]=[alldata[`${email}`]['cards']['cards_name'],alldata[`${email}`]['cards']['cards_desc'],alldata[`${email}`]['cards']['cards_title'],alldata[`${email}`]['tasks'],alldata[`${email}`]['date'],req.body.name]
             let cardsdata = []
             let index = null;
             let count=-1;
@@ -119,61 +159,100 @@ connectToDatabase().then(async() => {
                 }
             });
 
-            cards_name.forEach((element,index1) => {
-                if (element==0) {
-                    count++;
-                    if (count==index || count-1==index) {
-                        cardsdata.push(index1)
+            
+            if (index === null) {
+                for (let index = 0; index < alldata[email]['groups'].length; index++) {
+                    const gworksp = await collection1.findOne({[alldata[email]['groups'][index]]: {$exists : true}});
+                    if (gworksp[alldata[email]['groups'][index]]['workspaces'][0] === workspace) {
+                        for (let index1 = 0; index1 < gworksp[alldata[email]['groups'][index]]['users'].length; index1++) {
+                                const groupusers = gworksp[alldata[email]['groups'][index]]['users'][index1];
+                                if (groupusers === name) {
+                                    gworksp[alldata[email]['groups'][index]]['users'].splice(index1,1);
+                                }
+                            }
+                        
+                        if (gworksp[alldata[email]['groups'][index]]['users'][0] === undefined) {
+                            const id = gworksp._id
+                            collection1.deleteOne({_id : id});
+                        }
+                        else{
+                            collection1.updateOne(
+                                {[alldata[email]['groups'][index]]: {$exists : true}},  
+                                { $set: {
+                                    [`${alldata[email]['groups'][index]}.users`]: gworksp[alldata[email]['groups'][index]]['users'], 
+                                },
+                            }  
+                            );
+                        }
+                        alldata[email]['groups'].splice(index,1);
+                        break;
                     }
                 }
-            });
-
-            count=cardsdata[1]?cardsdata[1]:cards_name.length
-            cards_name.splice(cardsdata[0],count-cardsdata[0]);
-            cards_title.splice(cardsdata[0],count-cardsdata[0]);
-            cards_desc.splice(cardsdata[0],count-cardsdata[0]);
-            
-            count=-1;
-            cardsdata=[];
-            tasks.forEach((task,index1) => {
-                if (task==0) {
-                    count++;
-                    if (count==index || count-1==index) {
-                        cardsdata.push(index1);
+                await collection.updateOne(
+                    {[email]:{ $exists : true }},  
+                    { $set: {
+                        [`${email}.groups`]: alldata[email]['groups'], 
+                    },
+                }  
+                );
+            }
+            else{
+                cards_name.forEach((element,index1) => {
+                    if (element==0) {
+                        count++;
+                        if (count==index || count-1==index) {
+                            cardsdata.push(index1)
+                        }
                     }
-                }    
-            });
-            
-            count=cardsdata[1]?cardsdata[1]:tasks.length
-            tasks.splice(cardsdata[0],count-cardsdata[0])
-            cdates.splice(cardsdata[0],count-cardsdata[0]);
-
-            await collection.updateOne(
-                {[email]:{ $exists : true }},  
-                { $set: {
-                    [cname]: cards_name,
-                    [ctitle]: cards_title,
-                    [cdesc]: cards_desc,
-                    [dates]: cdates 
-                },
-            }  
-            );
-
-            await collection.updateOne(
-                {[email]:{ $exists : true }},  
-                { $pull: {
-                    [data]: workspace,
-                },
-            }  
-            );
-
-            await collection.updateOne(
-                {[email]:{ $exists : true }},  
-                { $set: {
-                    [data2]: tasks,
-                },
-            }  
-            );
+                });
+    
+                count=cardsdata[1]?cardsdata[1]:cards_name.length
+                cards_name.splice(cardsdata[0],count-cardsdata[0]);
+                cards_title.splice(cardsdata[0],count-cardsdata[0]);
+                cards_desc.splice(cardsdata[0],count-cardsdata[0]);
+                
+                count=-1;
+                cardsdata=[];
+                tasks.forEach((task,index1) => {
+                    if (task==0) {
+                        count++;
+                        if (count==index || count-1==index) {
+                            cardsdata.push(index1);
+                        }
+                    }    
+                });
+                
+                count=cardsdata[1]?cardsdata[1]:tasks.length
+                tasks.splice(cardsdata[0],count-cardsdata[0])
+                cdates.splice(cardsdata[0],count-cardsdata[0]);
+    
+                await collection.updateOne(
+                    {[email]:{ $exists : true }},  
+                    { $set: {
+                        [cname]: cards_name,
+                        [ctitle]: cards_title,
+                        [cdesc]: cards_desc,
+                        [dates]: cdates 
+                    },
+                }  
+                );
+    
+                await collection.updateOne(
+                    {[email]:{ $exists : true }},  
+                    { $pull: {
+                        [data]: workspace,
+                    },
+                }  
+                );
+    
+                await collection.updateOne(
+                    {[email]:{ $exists : true }},  
+                    { $set: {
+                        [data2]: tasks,
+                    },
+                }  
+                );
+            }
         }
         else if(check==2){
             let workspace_newname = req.body.workspace_new;
@@ -191,91 +270,142 @@ connectToDatabase().then(async() => {
         let [cname,ctitle,cdesc,data2,cdate]=[data+"cards_name",data+"cards_title",data+"cards_desc",email+".tasks",`${email}.date`]
 
         if (check==0) {
-            let [card_title,card_desc,pos]= [req.body.cardtitle,req.body.carddesc,req.body.position]
+            let [card_title,card_desc,pos,choose]= [req.body.cardtitle,req.body.carddesc,req.body.position,[0]]
             let datas = await collection.findOne({[email]:{ $exists : true }});
             datas = datas[email];
-            let tasks = datas['tasks'];
 
-            let [count,venom]=[-1,0];
-
-            datas['workspaces'].forEach((workspace,index) => {
-                if (workspace==active_workspace) {
-                    active_workspace=index
+            let verify = datas['workspaces']
+            for (let index = 0; index < verify.length; index++) {
+                const element = verify[index];
+                if (element != active_workspace) {
+                    choose[0] = 1;
                 }
-            });
-
-            for (let index = 0; index < tasks.length; index++) {
-                const element = tasks[index];
-                if (element === 0) {
-                    count++;
-                }
-                if (active_workspace === count) {
-                    if (typeof element == 'string') {
-                        venom++;
-                    }
+                else{
+                    choose[0] = 0;
+                    break;
                 }
             }
 
-            count = 0;
-
-            for (let index = 0; index < datas['cards']['cards_name'].length; index++) {
-                if (datas['cards']['cards_name'][index]==0) {
-                    if (count==active_workspace+1) {
-                        pos=index;
+            if (choose[0] === 1) {
+                let datagroups = datas['groups'];
+                for (let index = 0; index < datagroups.length; index++) {
+                    const element = datagroups[index];
+                    let waitforit = await collection1.findOne({[element]:{$exists : true}})
+                    if (waitforit[element]['workspaces'][0] === active_workspace) {
+                        datas = waitforit[element]
+                        datagroups.push(element)
                         break;
+                    }   
+                }
+                let tasks = datas['tasks'];
+                tasks.push(1)
+                tasks.push('Task 1')
+                let venom = datas['cards']['cards_name'].length-1
+                datas['cards']['cards_name'].push(`Card ${parseInt(datas['cards']['cards_name'][venom].split(' ')[1])+1}`)
+                datas['cards']['cards_desc'].push(`Card Description`)
+                datas['cards']['cards_title'].push(`Card Title`)
+                datas['date'].push(dates)
+                datas['date'].push(dates)
+
+                await collection1.updateOne(
+                    { [`${datagroups[datagroups.length-1]}`]: { $exists: true } },
+                    {
+                      $set: {
+                        [`${datagroups[datagroups.length-1]}.cards.cards_name`]: datas['cards']['cards_name'],
+                        [`${datagroups[datagroups.length-1]}.cards.cards_title`]: datas['cards']['cards_title'],
+                        [`${datagroups[datagroups.length-1]}.cards.cards_desc`]: datas['cards']['cards_desc'],
+                        [`${datagroups[datagroups.length-1]}.tasks`]: tasks,
+                        [`${datagroups[datagroups.length-1]}.date`]: dates
+                      }
                     }
-                    else{
+                );
+
+                res.json(venom);
+            }
+            else{
+                let tasks = datas['tasks'];
+                let [count,venom]=[-1,0];
+    
+                datas['workspaces'].forEach((workspace,index) => {
+                    if (workspace==active_workspace) {
+                        active_workspace=index
+                    }
+                });
+    
+                for (let index = 0; index < tasks.length; index++) {
+                    const element = tasks[index];
+                    if (element === 0) {
                         count++;
                     }
-                }
-                if (datas['cards']['cards_name'].length-1 == index){
-                    pos = datas['cards']['cards_name'].length;
-                }
-            }
-            check=0;
-            count=0;
-            
-            for (let index = 0; index < datas['tasks'].length; index++) {
-                if (datas['tasks'][index]==0) {
-                    if (active_workspace+1 == check) {
-                        count=index;
-                        break;
+                    if (active_workspace === count) {
+                        if (typeof element == 'string') {
+                            venom++;
+                        }
                     }
-                    check++;
                 }
-                if (datas['tasks'].length-1 == index){
-                    count = datas['tasks'].length;
+    
+                count = 0;
+    
+                for (let index = 0; index < datas['cards']['cards_name'].length; index++) {
+                    if (datas['cards']['cards_name'][index]==0) {
+                        if (count==active_workspace+1) {
+                            pos=index;
+                            break;
+                        }
+                        else{
+                            count++;
+                        }
+                    }
+                    if (datas['cards']['cards_name'].length-1 == index){
+                        pos = datas['cards']['cards_name'].length;
+                    }
                 }
-            }
-
-            await collection.updateMany(
-                { [email]: { $exists: true } },
-                {
-                  $push: {
-                    [cname]: {
-                      $each: [card_name],
-                      $position: pos
-                    },
-                    [ctitle]: {
-                      $each: [card_title],
-                      $position: pos
-                    },
-                    [cdesc]: {
-                      $each: [card_desc],
-                      $position: pos,
-                    },
-                    [data2]: {
-                        $each: [0o1,"Task 1"],
-                        $position:count,
-                    },
-                    [cdate] : {
-                        $each : [dates,dates],
-                        $position : count
-                    }  
-                  }
+                check=0;
+                count=0;
+                
+                for (let index = 0; index < datas['tasks'].length; index++) {
+                    if (datas['tasks'][index]==0) {
+                        if (active_workspace+1 == check) {
+                            count=index;
+                            break;
+                        }
+                        check++;
+                    }
+                    if (datas['tasks'].length-1 == index){
+                        count = datas['tasks'].length;
+                    }
+                }
+    
+                await collection.updateMany(
+                    { [email]: { $exists: true } },
+                    {
+                    $push: {
+                        [cname]: {
+                        $each: [card_name],
+                        $position: pos
+                        },
+                        [ctitle]: {
+                        $each: [card_title],
+                        $position: pos
+                        },
+                        [cdesc]: {
+                        $each: [card_desc],
+                        $position: pos,
+                        },
+                        [data2]: {
+                            $each: [0o1,"Task 1"],
+                            $position:count,
+                        },
+                        [cdate] : {
+                            $each : [dates,dates],
+                            $position : count
+                        }  
+                    }
                 }
             );
             res.json(venom);
+            }
+            
         }
         else if(check==1){
             let datas = await collection.findOne({[email]:{ $exists : true }});
@@ -632,7 +762,7 @@ connectToDatabase().then(async() => {
     })
 
     app.post("/readworkspace",async(req,res)=>{
-        let [email,workspace] = [`${req.body.email}`.split('@')[0],req.body.workspace];
+        let [email,name,workspace] = [`${req.body.email}`.split('@')[0],req.body.name,req.body.workspace];
         let data = await collection.findOne({[email]:{ $exists : true }});
         collection.updateOne(
             { [email]: { $exists: true } }, 
@@ -640,50 +770,107 @@ connectToDatabase().then(async() => {
         )         
         let [cards_name,cards_desc,cards_title,tasks]=[data[`${email}`]['cards']['cards_name'],data[`${email}`]['cards']['cards_desc'],data[`${email}`]['cards']['cards_title'],data[`${email}`]['tasks']];
         let [index,count,alldata,newdata,newtask,array]=[null,-1,[cards_name,cards_title,cards_desc],[],[],[]];
-
+        let groups = data[`${email}`]['groups'];
+        let gdata = [];
+        try {
+            for (let index = 0; index < groups.length; index++) {
+                const grp = groups[index];
+                let tempdata = await collection1.findOne({ [grp]: { $exists: true } });
+                gdata.push(tempdata[grp]);
+            }
+            gdata = await gdata;
+        } catch (error) {
+            
+        }    
+        
+        
         data[`${email}`]['workspaces'].forEach((worksp,num) => {
             if (worksp==workspace) {
                 index=num; 
             }
         });
-        
-        alldata.forEach(elem => {
-            elem.forEach(element => {
+
+        if (index == null && gdata != []) {
+            let groupintegrated_data = [[],[],[],[],[]]
+            let cardstring = ['cards_name','cards_title','cards_desc']
+            let grouptasks = [];
+            for (let index = 0; index < gdata.length; index++) {
+                const data = gdata[index];
+                
+                if (data.workspaces[0] == workspace) {
+                    cardstring.forEach((cstring,index) => {
+                        data.cards[cstring].forEach(element => {
+                            if (element!=0) {
+                                groupintegrated_data[index].push(element)                
+                            }
+                        });
+                    });
+                    data.tasks.forEach(tasks => {
+                        if (tasks!=0) {
+                            if (tasks!=1) {
+                                array.push(tasks);
+                            }
+                            else{
+                                grouptasks.push(array);
+                                array=[]
+                            }
+                        }
+                    });
+                }
+            }
+            if (array.length!=null) {
+                grouptasks.push(array)
+            }
+            grouptasks.splice(0,1)
+            for (let index = 0; index < 3; index++) {
+                groupintegrated_data[index].forEach(element => {
+                    groupintegrated_data[4].push(element)
+                });
+            }
+            grouptasks.forEach(gtask => {
+                groupintegrated_data[4].push(gtask)
+            });
+            res.json({arrays:groupintegrated_data[4],section:1})
+        }
+        else{
+            alldata.forEach(elem => {
+                elem.forEach(element => {
+                    if (count==index) {
+                        if (element!=0) {
+                            newdata.push(element)
+                        }
+                    }
+                    if (element==0) {
+                        count++;
+                    }
+                });
+                count=-1;
+            });
+            
+            tasks.forEach(task => {
                 if (count==index) {
-                    if (element!=0) {
-                        newdata.push(element)
+                    if (task!=0) {
+                        if (task!=1) {
+                            array.push(task);
+                        }
+                        else{
+                            newtask.push(array);
+                            array=[]
+                        }
                     }
                 }
-                if (element==0) {
+                if (task==0) {
                     count++;
                 }
             });
-            count=-1;
-        });
-        
-        tasks.forEach(task => {
-            if (count==index) {
-                if (task!=0) {
-                    if (task!=1) {
-                        array.push(task);
-                    }
-                    else{
-                        newtask.push(array);
-                        array=[]
-                    }
-                }
+            if (tasks[tasks.length-1]!=0 || tasks[tasks.length-1]!=1) {
+                newtask.splice(0,1);
+                newtask.push(array);
+                array=[]
             }
-            if (task==0) {
-                count++;
-            }
-        });
-        if (tasks[tasks.length-1]!=0 || tasks[tasks.length-1]!=1) {
-            newtask.splice(0,1);
-            newtask.push(array);
-            array=[]
+            let concatenatedArray=newtask[0][0]!=undefined?newdata.concat(newtask):newdata;
+            res.json({arrays:concatenatedArray,section:1})
         }
-        let concatenatedArray=newtask[0][0]!=undefined?newdata.concat(newtask):newdata;
-        res.json(concatenatedArray)
     })
 
     function checker(save, mlength) {
@@ -909,8 +1096,8 @@ connectToDatabase().then(async() => {
     
         const maxValue = Math.max(...data);
     
-        const svgWidth = 400;
-        const svgHeight = 200;
+        const svgWidth = 150;
+        const svgHeight = 150;
         const margin = { top: 20, right: 20, bottom: 30, left: 40 };
         const chartWidth = svgWidth - margin.left - margin.right;
         const chartHeight = svgHeight - margin.top - margin.bottom;
@@ -939,7 +1126,48 @@ connectToDatabase().then(async() => {
     
         return svg;
     }
+    
         
+    app.get("/visual" , async(req,res)=>{
+        const configuration = {
+            type: 'bar',
+            data: {
+                labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+                datasets: [{
+                    label: '# of Votes',
+                    data: [12, 19, 3, 5, 2, 3],
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.2)',
+                        'rgba(54, 162, 235, 0.2)',
+                        'rgba(255, 206, 86, 0.2)',
+                        'rgba(75, 192, 192, 0.2)',
+                        'rgba(153, 102, 255, 0.2)',
+                        'rgba(255, 159, 64, 0.2)'
+                    ],
+                    borderColor: [
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)',
+                        'rgba(255, 159, 64, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        };
+    
+        const image = await canvasRenderService.renderToDataURL(configuration);
+
+        res.json({ chart: image });
+    })
 
     app.post("/timedetector",async(req,res)=>{
         let dates = [date.getDate(),date.getMonth(),date.getFullYear(),date.getHours(),date.getMinutes()];

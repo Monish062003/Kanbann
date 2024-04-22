@@ -1,7 +1,7 @@
 import React from 'react'
 import {BrowserRouter,Routes,Route} from 'react-router-dom'
 import Boardpage from './components/boardpage';
-import Group from './components/Group';
+import JGroup from './components/JoinG';
 
 function App() {
   return (
@@ -9,7 +9,7 @@ function App() {
         <BrowserRouter>
           <Routes>
             <Route path='/' element={<Boardpage/>}/>
-            <Route path='/group' element={<Group/>}/>
+            <Route path='/group' element={<JGroup/>}/>
           </Routes>
         </BrowserRouter>
     </div>

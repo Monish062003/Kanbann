@@ -11,7 +11,7 @@
 
 .grouppanel{
     width: 40vw;
-    height: 42vh;
+    height: 40vh;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -69,18 +69,6 @@
 }
 
 .clipboard h3{
-    display: flex;
-    gap: 10px;
     position: relative;
     bottom: 1.5vh;
-}
-
-.clipboard h3 i{
-    position: relative;
-    top: 1.5vh;
-}
-
-.clipboard button{
-    position: relative;
-    bottom: 3vh;
 }

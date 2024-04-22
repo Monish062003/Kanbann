@@ -16,7 +16,7 @@ export default function Tasksection(props) {
     try {
       if (refreshstopper==0) {
         let elements = document.getElementsByClassName('list');
-        elements[parseInt(props.beforetaskslength)+parseInt(props.taskarrange)].children[0].children[0].placeholder=props.value;
+        elements[parseInt(props.beforetaskslength)+parseInt(props.taskarrange)].children[0].placeholder=props.value;
         refreshstopper++;
       }
     } catch (error) {
@@ -29,7 +29,7 @@ export default function Tasksection(props) {
     let changestate = props.changingstate;
     let count=localStorage.getItem('count');
     
-    let tdata =  axios.post("http://localhost:80/task",{
+    let tdata =  axios.post("https://server-gray-omega.vercel.app/task",{
       email:document.cookie.split("=")[1],
       card_name:props.cardname,
       workspace:props.current_workspace,
@@ -62,8 +62,7 @@ export default function Tasksection(props) {
     if (event.key === 'Enter') {
       let [oldvalue,newvalue] = [inputvalue.current.placeholder,inputvalue.current.value];
       inputvalue.current.placeholder=newvalue;
-      
-      let tdata =  axios.post("http://localhost:80/task",{
+      axios.post("https://server-gray-omega.vercel.app/task",{
         email:document.cookie.split("=")[1],
         card_name:props.cardname,
         workspace:props.current_workspace,
@@ -75,11 +74,9 @@ export default function Tasksection(props) {
   }
 
   return (
-    <div className='list'>
-      <div className="input-group mb-3" draggable="true">
-        <input type="text" className="form-control" value={taskdata} onChange={onChangeListener} onKeyUp={onChangeListener} ref={inputvalue} aria-label="Recipient's username" aria-describedby="button-addon2" onKeyDown={savetype}/>
-        <button className="btn btn-outline-secondary" type="button" id="button-addon2" onClick={TaskButton}>Remove</button>
-      </div>
+    <div className='list' style={{display:"flex",paddingBottom:"2vh"}}>
+      <textarea className="form-control" value={taskdata} onChange={onChangeListener} onKeyUp={onChangeListener} ref={inputvalue} onKeyDown={savetype} ></textarea>
+      <button className="btn btn-outline-secondary" type="button" id="button-addon2" onClick={TaskButton}>Remove</button>
     </div>
   )
 }

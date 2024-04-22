@@ -11,7 +11,13 @@
     background: rgba(47, 48, 52, 0.68);
     width: var(--totalmaxwidth);
     z-index: 6;
-    height: 92vh;
+    height: var(--totalheight);
+}
+
+.fixspacelength{
+    display: flex;
+    flex-direction: column;
+    height: 65vh;
 }
 
 .nav-direction{
@@ -38,7 +44,7 @@
     background-color: rgba(96, 89, 89, 0.66);
 }
 
-.create-group,.join-group{
+.join-group{
     display: flex;
     justify-content: center;
     align-items: center;
@@ -55,13 +61,9 @@
     line-height: normal;
 }
 
-.create-group:hover,.join-group:hover{
+.join-group:hover{
     cursor: pointer;
     background-color: rgba(146, 135, 131, 0.5);
-}
-
-.create-group{
-    border-top: 1px solid white;
 }
 
 
@@ -128,8 +130,18 @@
 }
 
 .workspacehandler{
-    height: 53vh;
+    display: none;
+    max-height: 53vh;
     overflow-y: scroll;
+}
+
+.posdown{
+    width: var(--totalmaxwidth);
+}
+
+#AddW{
+    border-top: 1px solid white;
+    border-bottom: 0px ;
 }
 
 .workspacehandler::-webkit-scrollbar{
@@ -244,7 +256,7 @@
         --totalminwidth:9vw;
     }
 
-    .workspace-group{
+    .workspace-group,.join-group{
         font-size: 1rem;
     }
 
@@ -294,6 +306,10 @@
 
     .nav-direction{
         height: 8vh;
+    }
+
+    .fixspacelength{
+        height: 67vh;
     }
 
     .workspace-group button{

@@ -4,6 +4,7 @@ import Sideswift from '../Images/downarrow.png'
 import axios from "axios"
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Group from './Group'
+import JoinG from './JoinG'
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Bounce } from 'react-toastify';
@@ -14,72 +15,83 @@ function Sidepanel(props) {
   let count=0;
   let refreshstopper=0;
   const[group,showgroup]=useState(false)
+  const[jgroup,showjgroup]=useState(false)
 
   useEffect(()=>{
     iterations=2;
     if (refreshstopper == 0) {
       (async()=>{
         let data = await props.data;
+        let gdata = await props.gdata;
         if (data != null) {
           data.map((workspace) => {
-            readwrite(workspace);
+            readwrite(workspace,0);
+          });
+        }
+        if (gdata != null) {
+          gdata.map((workspace) => {
+            readwrite(workspace,1);
           });
         }
       })();
     }
     refreshstopper++;
-  },[props.data])
+  },[props.data,props.gdata])
   
-  const transit=(()=>{
-    let wholecontainer=document.querySelector(".side-container");
-    let directbutton=document.querySelector(".sidedirect-button");
-    let workspacegroup=document.querySelector(".workspace-group");
-    let workspacehandler=document.querySelector(".workspacehandler");
-    let cardcontainer=document.querySelector(".card-container");
-    let innercontainer=document.querySelector(".innercontainer");
-    
-    if (iterations%2==0) {
-      wholecontainer.classList.add("side-container-swipe");
-      directbutton.classList.add("sidedirect-button-swipebutton");
-      workspacegroup.classList.add("sideopaquetext");
-      cardcontainer.classList.add("mincontainer");
-      innercontainer.classList.add("mininnercontainer");
-      workspacehandler.classList.add("sideopaquetext");
-      try {
-        cardcontainer.classList.remove("maxcontainer");
-        innercontainer.classList.remove("maxinnercontainer");
-        wholecontainer.classList.remove("side-container-swipeinv");
-        directbutton.classList.remove("sidedirect-button-swipebuttoninv");
-        workspacegroup.classList.remove("sideopaquetextinv");
-        workspacehandler.classList.remove("sideopaquetextinv");
-      } catch (error) {}
-    }
-    else{
-      try {
-        cardcontainer.classList.remove("mincontainer");
-        innercontainer.classList.remove("mininnercontainer");
-        wholecontainer.classList.remove("side-container-swipe");
-        directbutton.classList.remove("sidedirect-button-swipebutton");
-        workspacegroup.classList.remove("sideopaquetext");
-        workspacehandler.classList.remove("sideopaquetext");
-      } catch (error) {}
-      cardcontainer.classList.add("maxcontainer");
-      innercontainer.classList.add("maxinnercontainer");
-      wholecontainer.classList.add("side-container-swipeinv");
-      directbutton.classList.add("sidedirect-button-swipebuttoninv");
-      workspacegroup.classList.add("sideopaquetextinv");
-      workspacehandler.classList.add("sideopaquetextinv");
-    }
-    iterations++;
-  })
+  const transit = () => {
+    const wholecontainer = document.querySelector(".side-container");
+    const directbutton = document.querySelector(".sidedirect-button");
+    const workspacegroup = document.querySelectorAll(".workspace-group");
+    const workspacehandler = document.querySelectorAll(".workspacehandler");
+    const cardcontainer = document.querySelector(".card-container");
+    const innercontainer = document.querySelector(".innercontainer");
+    const groups = document.querySelectorAll(".join-group");
+    const isEvenIteration = iterations % 2 === 0;
+    const posdown = document.getElementsByClassName('posdown')[0];
 
+    for (let index = 0; index < workspacegroup.length; index++) {
+      workspacegroup[index].classList.toggle("sideopaquetext", isEvenIteration);
+    }
+    for (let index = 0; index < workspacehandler.length; index++) {
+      workspacehandler[index].classList.toggle("sideopaquetext", isEvenIteration);
+    }
+    for (let index = 0; index < groups.length; index++) {
+      groups[index].classList.toggle("sideopaquetext", isEvenIteration);
+    }
+
+    wholecontainer.classList.toggle("side-container-swipe", isEvenIteration);
+    directbutton.classList.toggle("sidedirect-button-swipebutton", isEvenIteration);
+    cardcontainer.classList.toggle("mincontainer", isEvenIteration);
+    innercontainer.classList.toggle("mininnercontainer", isEvenIteration);
+
+    try {
+        for (let index = 0; index < workspacegroup.length; index++) {
+          workspacegroup[index].classList.toggle("sideopaquetextinv", !isEvenIteration);
+        }
+        for (let index = 0; index < workspacehandler.length; index++) {
+          workspacehandler[index].classList.toggle("sideopaquetextinv", !isEvenIteration);
+        }
+        for (let index = 0; index < groups.length; index++) {
+          groups[index].classList.toggle("sideopaquetextinv", !isEvenIteration);
+        }
+      
+      cardcontainer.classList.toggle("maxcontainer", !isEvenIteration);
+      innercontainer.classList.toggle("maxinnercontainer", !isEvenIteration);
+      wholecontainer.classList.toggle("side-container-swipeinv", !isEvenIteration);
+      directbutton.classList.toggle("sidedirect-button-swipebuttoninv", !isEvenIteration);
+    } catch (error) {}
+    
+    iterations++;
+  }
+  
   const remove=(async(e)=>{
     if (e.target.tagName=="BUTTON") {
       count--;
       let title=e.target.parentElement.children[0].innerHTML?e.target.parentElement.children[0].innerHTML:e.target.parentElement.children[0].name;
 
-      axios.post("http://localhost:80/workspace",{
+      axios.post("https://server-gray-omega.vercel.app/workspace",{
         email:document.cookie.split("=")[1],
+        name:document.cookie.split("=")[0],
         workspacename:title,
         check:1,
       })
@@ -112,7 +124,7 @@ function Sidepanel(props) {
         workspace_name.remove();         
         let workspace_newname=document.createElement('div');
 
-        axios.post("http://localhost:80/workspace",{
+        axios.post("https://server-gray-omega.vercel.app/workspace",{
           email:document.cookie.split("=")[1],
           check:2,
           workspace_new:title,
@@ -126,6 +138,7 @@ function Sidepanel(props) {
       }
     }
   }
+
   const edit=(async(e)=>{
     if (e.target.tagName==="DIV") {
       let textbox = document.createElement('input');
@@ -159,11 +172,13 @@ function Sidepanel(props) {
     }
   })
   
-  const readwrite = (name) =>{
+  const readwrite = (name,section) =>{
     let workspacetab=document.createElement('div');
     let text=document.createElement('div');
     let button=document.createElement('button');
-    let container=document.getElementsByClassName('workspacehandler')[0];
+
+    let container=section==0?document.getElementsByClassName('workspacehandler')[0]:document.getElementsByClassName('workspacehandler')[1];
+    
     count++;
     workspacetab.classList.add('workspace-group');
     text.name= name;
@@ -204,7 +219,7 @@ function Sidepanel(props) {
       workspacetab.appendChild(text);
       workspacetab.appendChild(button);
 
-      axios.post("http://localhost:80/workspace",{
+      axios.post("https://server-gray-omega.vercel.app/workspace",{
         email:document.cookie.split("=")[1],
         workspacename:text.innerHTML,
         check:0,
@@ -214,7 +229,7 @@ function Sidepanel(props) {
       toast.warn('Please Login to your Account')
     }
   });
-
+  
   const create_group = () =>{
     if (document.cookie.split("=")[1]) {
       showgroup(true)
@@ -226,24 +241,34 @@ function Sidepanel(props) {
 
   const join_group = () =>{
     if (document.cookie.split("=")[1]) {
-      
+      showjgroup(true)
     }
     else{
       toast.warn('Please Login to your Account')
     }
   }
 
-
   const call_individuals = (event) =>{
     let targeted = event.target;
-    targeted.classList.toggle("rotatetoninty");
-    targeted.classList.toggle("rotatetonifty");
+    if (targeted.className.split(' ')[3] === 'rotatetonifty') {
+      targeted.classList.remove("rotatetonifty");
+      targeted.classList.add("rotatetoninty");
+      document.getElementsByClassName('workspacehandler')[0].style.display = "block";
+    }
+    else{
+      targeted.classList.add("rotatetonifty");
+      targeted.classList.remove("rotatetoninty");
+      document.getElementsByClassName('workspacehandler')[0].style.display = "none"    
+    }
   }
 
   const call_groups = (event) =>{
     let targeted = event.target;
-    targeted.classList.toggle("rotatetoninty");
-    targeted.classList.toggle("rotatetonifty");
+    if (targeted != undefined) {
+      targeted.classList.toggle("rotatetonifty");
+      targeted.classList.toggle("rotatetoninty");
+      document.getElementsByClassName('workspacehandler')[1].style.display === "block"?document.getElementsByClassName('workspacehandler')[1].style.display = "none":document.getElementsByClassName('workspacehandler')[1].style.display = "block";
+    }
   }
 
   return (
@@ -253,15 +278,21 @@ function Sidepanel(props) {
           <img src={Sideswift} alt="downarrow" />
         </button>
       </div>
-      <div className="workspace-group">Individual &nbsp;&nbsp;<button onClick={(e)=>{call_individuals(e)}}><i className="fa-solid fa-caret-down fa-sm rotatetonifty" style={{"color": "#ffffff"}}></i></button></div>
-      <div className="workspace-group">Group &nbsp;&nbsp;<button onClick={(e)=>{call_groups(e)}}><i className="fa-solid fa-caret-down fa-sm rotatetonifty" style={{"color": "#ffffff"}}></i></button></div>
-      <div className="workspacehandler"></div>
-      <div className="workspace-group" style={{"borderTop":"1px solid white","borderBottom":"none"}}>Add a Workspace &nbsp;&nbsp;&nbsp;<button onClick={add}>+</button></div>
-      <div className="group-panel">
-        <div className="create-group" onClick={create_group}>Create a Group <i className="fa-solid fa-user-group fa-sm"></i></div>
-        <div className="join-group" onClick={join_group}>Join a Group <i className="fa-solid fa-users fa-sm"></i></div>
+      <div className='fixspacelength'>
+        <div className="workspace-group">Individual &nbsp;&nbsp;<button onClick={(e)=>{call_individuals(e)}}><i className="fa-solid fa-caret-down fa-sm rotatetonifty" style={{"color": "#ffffff"}}></i></button></div>
+        <div className="workspacehandler"></div>
+        <div className="workspace-group">Group &nbsp;&nbsp;<button onClick={(e)=>{call_groups(e)}}><i className="fa-solid fa-caret-down fa-sm rotatetonifty" style={{"color": "#ffffff"}}></i></button></div>
+        <div className="workspacehandler"></div>
       </div>
+      <span className='posdown'>
+        <div className="workspace-group" id='AddW'>Add a Workspace &nbsp;&nbsp;&nbsp;<button onClick={add}>+</button></div>
+        <div className="group-panel">
+          <div className="join-group" style={{borderTop:"1px solid white"}} onClick={create_group}>Create a Group <i className="fa-solid fa-user-group fa-sm"></i></div>
+          <div className="join-group" onClick={join_group}>Join a Group <i className="fa-solid fa-users fa-sm"></i></div>
+        </div>
+      </span>
       {group && <Group boarddisplay={showgroup} edit={edit} remove={remove} changecardspanel={changecardspanel} />}
+      {jgroup && <JoinG boarddisplay={showjgroup} edit={edit} remove={remove} changecardspanel={changecardspanel} />}
       <ToastContainer
         position="top-center"
         autoClose={1500}
