@@ -19,7 +19,7 @@ export default function JoinG(props) {
   
   const searchGroup = async() => {
     if (display.txtval) {
-      const search_result = await axios.post('https://server-gray-omega.vercel.app/handlegroup',{
+      const search_result = await axios.post('http://localhost:80/handlegroup',{
         email:document.cookie.split("=")[1],
         name:document.cookie.split("=")[0],
         code:display.txtval,
@@ -33,7 +33,7 @@ export default function JoinG(props) {
 
   const registerGroup = async() =>{
     if (display.txtval || localStorage.getItem('code')) {
-      const search_result = await axios.post('https://server-gray-omega.vercel.app/handlegroup',{
+      const search_result = await axios.post('http://localhost:80/handlegroup',{
         email:document.cookie.split("=")[1],
         name:document.cookie.split("=")[0],
         code:localStorage.getItem('code'),
