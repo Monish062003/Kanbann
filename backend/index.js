@@ -3,15 +3,10 @@ const app = express();
 const cors = require('cors')
 const bodyParser = require('body-parser');
 const {MongoClient} = require('mongodb');
-const { ChartJSNodeCanvas } = require('chartjs-node-canvas');
-const { Promise } = require('mongoose');
 
 app.use(express.urlencoded());
 app.use(bodyParser.json());
 app.use(cors())
-const canvasRenderService = new ChartJSNodeCanvas({ width: 400, height: 400 });
-
-
 
 
 let [db,client,collection,collection1] = '';
