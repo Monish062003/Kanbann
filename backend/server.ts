@@ -1,21 +1,21 @@
-import express, { Application } from 'express';
-import cors from 'cors';
-import bodyParser from 'body-parser';
-import dotenv from 'dotenv';
-import { connectToDatabase } from './dbconfig/DB_Connection';
+import express, { Application } from "express";
+import cors from "cors";
+import bodyParser from "body-parser";
+import dotenv from "dotenv";
+import { connectToDatabase } from "./dbconfig/DB_Connection";
 
-import { user_router } from './Routers/users';
+import { user_router } from "./Routers/users";
 
-const parser: any = dotenv.config().parsed
+const parser: any = dotenv.config().parsed;
 const app: Application = express();
 const PORT: number = parser.PORT;
 app.use(express.urlencoded());
 app.use(bodyParser.json());
-app.use(cors())
+app.use(cors());
 
 connectToDatabase().then(() => {
-    app.use("/users", user_router);
-    app.listen(PORT, () => {
-        console.log(`Listen to http://localhost:${PORT}/`)
-    })
-})
+  app.use("/users", user_router);
+  app.listen(PORT, () => {
+    console.log(`Listen to http://localhost:${PORT}/`);
+  });
+});
