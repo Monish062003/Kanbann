@@ -1,30 +1,26 @@
 {
   "name": "backend",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
-    "serve": "nodemon server.js"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "description": "",
   "dependencies": {
-    "@svgdotjs/svg.js": "^3.2.0",
-    "axios": "^1.6.8",
-    "chart.js": "^3.5.1",
-    "chartjs-node-canvas": "^4.1.6",
+    "@types/body-parser": "^1.19.5",
+    "@types/cors": "^2.8.17",
+    "@types/express": "^4.17.21",
+    "@types/mongodb": "^4.0.7",
+    "@types/node": "^22.1.0",
+    "@types/nodemon": "^1.19.6",
+    "body-parser": "^1.20.2",
     "cors": "^2.8.5",
-    "d3-node": "^3.0.0",
-    "express": "^4.18.2",
-    "faker": "^6.6.6",
-    "fs": "^0.0.1-security",
-    "mongodb": "^6.3.0",
-    "mongoose": "^7.6.4",
-    "node-fetch": "^3.3.2",
-    "nodemon": "^3.0.1",
-    "pug": "^3.0.2",
-    "random-username-generator": "^1.0.4",
-    "svgdom": "^0.1.19"
-  },
-  "description": ""
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "mongodb": "^6.8.0",
+    "nodemon": "^3.1.4"
+  }
 }
