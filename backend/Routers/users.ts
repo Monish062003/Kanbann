@@ -1,6 +1,6 @@
 import { Request, Response, Router } from "express";
 import asyncHandler from "../Async/asynchandler";
-import { db, collection as users } from "../dbconfig/DB_Connection";
+import { collection as users } from "../dbconfig/DB_Connection";
 import { ObjectId } from "mongodb";
 
 export const user_router: Router = Router();
