@@ -1,6 +1,9 @@
 import { Request, Response, Router } from "express";
 import asyncHandler from "../Async/asynchandler";
-import { collection as users } from "../dbconfig/DB_Connection";
+import {
+  collection as userscollection,
+  collection1 as datacollection,
+} from "../dbconfig/DB_Connection";
 import { ObjectId } from "mongodb";
 
 export const user_router: Router = Router();
@@ -8,15 +11,16 @@ export const user_router: Router = Router();
 user_router.post(
   "/create_user",
   asyncHandler(async (req: Request, res: Response) => {
-    await users.insertOne(req.body);
-    res.sendStatus(200);
+    const response = await userscollection.insertOne(req.body);
+    datacollection.insertOne({ fid: response.insertedId.toString(), data: [] });
+    res.json(response.insertedId);
   })
 );
 
 user_router.post(
   "/read_user",
   asyncHandler(async (req: Request, res: Response) => {
-    const response = await users.findOne({
+    const response = await userscollection.findOne({
       _id: new ObjectId(`${req.body.id}`),
     });
     res.json(response);
