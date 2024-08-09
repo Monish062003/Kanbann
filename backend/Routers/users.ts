@@ -20,8 +20,8 @@ user_router.post(
 user_router.post(
   "/read_user",
   asyncHandler(async (req: Request, res: Response) => {
-    const response = await userscollection.findOne({
-      _id: new ObjectId(`${req.body.id}`),
+    const response = await datacollection.findOne({
+      fid: req.body.id,
     });
     res.json(response);
   })

@@ -1,14 +1,26 @@
 import { Request, Response, Router } from "express";
 import asyncHandler from "../Async/asynchandler";
-import { collection as users } from "../dbconfig/DB_Connection";
-import { ObjectId } from "mongodb";
+import { collection1 as datacollection } from "../dbconfig/DB_Connection";
 
 export const card_router: Router = Router();
 
 card_router.post(
   "/create_card",
   asyncHandler(async (req: Request, res: Response) => {
-    await users.insertOne(req.body);
+    await datacollection.updateOne(
+      { fid: req.body.id },
+      {
+        $push: {
+          [`data.$[workspace].${req.body.wname}`]: {
+            [`Card ${req.body.position}`]: [],
+          },
+        },
+      },
+      {
+        arrayFilters: [{ [`workspace.${req.body.wname}`]: { $exists: true } }],
+      }
+    );
+
     res.sendStatus(200);
   })
 );
@@ -16,29 +28,45 @@ card_router.post(
 card_router.post(
   "/update_card",
   asyncHandler(async (req: Request, res: Response) => {
-    const response = await users.findOne({
-      _id: new ObjectId(`${req.body.id}`),
-    });
-    res.json(response);
-  })
-);
-
-card_router.post(
-  "/read_card",
-  asyncHandler(async (req: Request, res: Response) => {
-    const response = await users.findOne({
-      _id: new ObjectId(`${req.body.id}`),
-    });
-    res.json(response);
+    await datacollection.updateOne(
+      { fid: req.body.id },
+      {
+        $set: {
+          [`data.$[workspace].${req.body.wname}.$[card].${req.body.ncname}`]:
+            [],
+        },
+        $unset: {
+          [`data.$[workspace].${req.body.wname}.$[card].${req.body.ocname}`]:
+            "",
+        },
+      },
+      {
+        arrayFilters: [
+          { [`workspace.${req.body.wname}`]: { $exists: true } },
+          { [`card.${req.body.ocname}`]: { $exists: true } },
+        ],
+      }
+    );
+    res.sendStatus(200);
   })
 );
 
 card_router.post(
   "/delete_card",
   asyncHandler(async (req: Request, res: Response) => {
-    const response = await users.findOne({
-      _id: new ObjectId(`${req.body.id}`),
-    });
-    res.json(response);
+    await datacollection.updateOne(
+      { fid: req.body.id },
+      {
+        $pull: {
+          [`data.$[workspace].${req.body.wname}`]: {
+            [req.body.cname]: { $exists: true },
+          },
+        },
+      },
+      {
+        arrayFilters: [{ [`workspace.${req.body.wname}`]: { $exists: true } }],
+      }
+    );
+    res.sendStatus(200);
   })
 );
