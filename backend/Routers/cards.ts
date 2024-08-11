@@ -32,18 +32,18 @@ card_router.post(
       { fid: req.body.id },
       {
         $set: {
-          [`data.$[workspace].${req.body.wname}.$[card].${req.body.ncname}`]:
+          [`data.$[workspace].${req.body.wname}.$[card].${req.body.newname}`]:
             [],
         },
         $unset: {
-          [`data.$[workspace].${req.body.wname}.$[card].${req.body.ocname}`]:
+          [`data.$[workspace].${req.body.wname}.$[card].${req.body.oldname}`]:
             "",
         },
       },
       {
         arrayFilters: [
           { [`workspace.${req.body.wname}`]: { $exists: true } },
-          { [`card.${req.body.ocname}`]: { $exists: true } },
+          { [`card.${req.body.oldname}`]: { $exists: true } },
         ],
       }
     );

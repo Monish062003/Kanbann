@@ -4,7 +4,6 @@ import {
   collection as userscollection,
   collection1 as datacollection,
 } from "../dbconfig/DB_Connection";
-import { ObjectId } from "mongodb";
 
 export const user_router: Router = Router();
 
