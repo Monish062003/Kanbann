@@ -10,7 +10,13 @@ workspace_router.post(
     await datacollection.updateOne(
       { fid: req.body.id },
       {
-        $push: { data: { [`Workspace ${req.body.position}`]: [] } },
+        $push: {
+          data: {
+            [`Workspace ${req.body.position}`]: [
+              { "Card 1": [{ "Task 1": [] }] },
+            ],
+          },
+        },
       }
     );
     res.sendStatus(200);
@@ -20,14 +26,21 @@ workspace_router.post(
 workspace_router.post(
   "/update_workspace",
   asyncHandler(async (req: Request, res: Response) => {
+    const { data: oldcontents } = await datacollection.findOne({
+      fid: req.body.id,
+    });
+    const workspaceData = oldcontents?.find(
+      (workspace: { [x: string]: any }) => workspace[req.body.oldname]
+    )?.[req.body.oldname];
+
     await datacollection.updateOne(
       { fid: req.body.id },
       {
-        $set: { [`data.$[elem].${req.body.wname1}`]: [] },
-        $unset: { [`data.$[elem].${req.body.wname}`]: "" },
+        $set: { [`data.$[elem].${req.body.newname}`]: workspaceData },
+        $unset: { [`data.$[elem].${req.body.oldname}`]: "" },
       },
       {
-        arrayFilters: [{ [`elem.${req.body.wname}`]: { $exists: true } }],
+        arrayFilters: [{ [`elem.${req.body.oldname}`]: { $exists: true } }],
       }
     );
 
