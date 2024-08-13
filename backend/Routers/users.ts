@@ -22,6 +22,6 @@ user_router.post(
     const response = await datacollection.findOne({
       fid: req.body.id,
     });
-    res.json(response);
+    res.json(response.data);
   })
 );
