@@ -6,7 +6,11 @@ import Sideswift from "../Images/downarrow.png";
 // import JoinG from './JoinG'
 import { useAppDispatch } from "../Slicers/hooks";
 import { useSelector } from "react-redux";
-import { sidepanelHandle, removeWorkspaceDB } from "../Slicers/slice";
+import {
+  sidepanelHandle,
+  removeWorkspaceDB,
+  addWorkspaceDB,
+} from "../Slicers/slice";
 import { stat } from "fs";
 
 // import { ToastContainer, toast } from "react-toastify";
@@ -15,12 +19,13 @@ import { stat } from "fs";
 // import "animate.css";
 
 function Sidepanel() {
-  let count = 0;
+  let totalbooleans: any = [];
   const [workspaces, setworkspaces] = useState<string[]>([]);
   const [displayworkspaces, setdisplayer] = useState({
     Individual: true,
     Group: false,
     iterations: true,
+    spacehandler: [],
   });
   const [group, showgroup] = useState(false);
   const [jgroup, showjgroup] = useState(false);
@@ -36,6 +41,13 @@ function Sidepanel() {
       data.reduce((acc: any, obj: any) => ({ ...acc, ...obj }), {})
     );
     setworkspaces(topLevelKeys);
+    for (let index = 0; index < topLevelKeys.length; index++) {
+      totalbooleans.push(true);
+    }
+    setdisplayer((prevDisplayWorkspaces) => ({
+      ...prevDisplayWorkspaces,
+      spacehandler: totalbooleans,
+    }));
   }, [data]);
 
   useEffect(() => {
@@ -150,7 +162,16 @@ function Sidepanel() {
     // }
   };
 
-  const edit = async (_e: any) => {
+  const edit = async (index: number) => {
+    console.log(index);
+    setdisplayer((prevDisplayWorkspaces: any) => {
+      const updatedSpacehandler = [...prevDisplayWorkspaces.spacehandler];
+      updatedSpacehandler[index] = !updatedSpacehandler[index];
+      return {
+        ...prevDisplayWorkspaces,
+        spacehandler: updatedSpacehandler,
+      };
+    });
     // if (e.target.tagName==="DIV") {
     //   let textbox = document.createElement('input');
     //   let workspace_name=e.target;
@@ -200,6 +221,9 @@ function Sidepanel() {
   };
 
   const add = async () => {
+    dispatch(
+      addWorkspaceDB({ id: Object_id, position: workspaces.length + 1 })
+    );
     // if (document.cookie.split("=")[1]) {
     //   let workspacetab=document.createElement('div');
     //   let text=document.createElement('div');
@@ -319,7 +343,11 @@ function Sidepanel() {
                     : "sideopaquetext"
                 }`}
               >
-                <div>{object}</div>
+                {displayworkspaces.spacehandler[index] ? (
+                  <div onDoubleClick={() => edit(index)}>{object}</div>
+                ) : (
+                  <div onDoubleClick={() => edit(index)}>{"Baka"}</div>
+                )}
                 <button onClick={remove}>-</button>
               </div>
             );
@@ -352,13 +380,22 @@ function Sidepanel() {
           }`}
         ></div>
       </div>
-      {/* <span className='posdown'>
-        <div className="workspace-group" id='AddW'>Add a Workspace &nbsp;&nbsp;&nbsp;<button onClick={add}>+</button></div>
-        <div className="group-panel">
+      <span className="posdown">
+        <div
+          className={`workspace-group ${
+            displayworkspaces.iterations
+              ? "sideopaquetextinv"
+              : "sideopaquetext"
+          }`}
+          id="AddW"
+        >
+          Add a Workspace &nbsp;&nbsp;&nbsp;<button onClick={add}>+</button>
+        </div>
+        {/* <div className="group-panel">
           <div className="join-group" style={{borderTop:"1px solid white"}} onClick={create_group}>Create a Group <i className="fa-solid fa-user-group fa-sm"></i></div>
           <div className="join-group" onClick={join_group}>Join a Group <i className="fa-solid fa-users fa-sm"></i></div>
-        </div>
-      </span> */}
+        </div> */}
+      </span>
       {/* {group && <Group boarddisplay={showgroup} edit={edit} remove={remove} changecardspanel={changecardspanel} />}
       {jgroup && <JoinG boarddisplay={showjgroup} edit={edit} remove={remove} changecardspanel={changecardspanel} />} */}
       {/* <ToastContainer

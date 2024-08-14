@@ -45,11 +45,22 @@ export const readuser: any = createAsyncThunk(
   }
 );
 
+export const addWorkspaceDB: any = createAsyncThunk(
+  "user_data/adduser",
+  async (objectid: any, thunkAPI) => {
+    await axios.post(
+      "http://localhost:3090/workspaces/create_workspace",
+      objectid
+    );
+    return objectid.position;
+  }
+);
+
 export const removeWorkspaceDB: any = createAsyncThunk(
   "user_data/removeuser",
   async (objectid: any, thunkAPI) => {
     console.log(objectid);
-    const response = await axios.post(
+    await axios.post(
       "http://localhost:3090/workspaces/delete_workspace",
       objectid
     );
@@ -82,6 +93,11 @@ const user_data_slice = createSlice({
       state.data = state.data.filter(
         (workspace: any) => Object.keys(workspace)[0] !== action.payload
       );
+    });
+    builder.addCase(addWorkspaceDB.fulfilled, (state, action) => {
+      state.data.push({
+        [`Workspace ${action.payload}`]: [{ "Card 1": [{ "Task 1": [] }] }],
+      });
     });
   },
 });
