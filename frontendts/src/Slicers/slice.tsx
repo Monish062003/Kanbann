@@ -52,7 +52,7 @@ export const addWorkspaceDB: any = createAsyncThunk(
       "http://localhost:3090/workspaces/create_workspace",
       objectid
     );
-    return objectid.position;
+    return objectid;
   }
 );
 
@@ -64,7 +64,18 @@ export const removeWorkspaceDB: any = createAsyncThunk(
       "http://localhost:3090/workspaces/delete_workspace",
       objectid
     );
-    return objectid.wname;
+    return objectid;
+  }
+);
+
+export const updateWorkspaceDB: any = createAsyncThunk(
+  "user_data/updateuser",
+  async (objectid: any, thunkAPI) => {
+    await axios.post(
+      "http://localhost:3090/workspaces/update_workspace",
+      objectid
+    );
+    return objectid;
   }
 );
 
@@ -90,14 +101,28 @@ const user_data_slice = createSlice({
       state.Object_id = action.payload.Object_id.id;
     });
     builder.addCase(removeWorkspaceDB.fulfilled, (state, action) => {
-      state.data = state.data.filter(
-        (workspace: any) => Object.keys(workspace)[0] !== action.payload
-      );
+      state.data = state.data.filter((workspace: any) => {
+        if (Object.keys(workspace)[0] === action.payload.wname) {
+          if (
+            workspace[action.payload.wname][
+              workspace[action.payload.wname].length - 1
+            ] !== action.payload.wid
+          ) {
+            return workspace;
+          }
+        } else {
+          return workspace;
+        }
+      });
     });
     builder.addCase(addWorkspaceDB.fulfilled, (state, action) => {
       state.data.push({
-        [`Workspace ${action.payload}`]: [{ "Card 1": [{ "Task 1": [] }] }],
+        Workspace: [{ "Card 1": [{ "Task 1": [] }] }, action.payload.wid],
       });
+    });
+    builder.addCase(updateWorkspaceDB.fulfilled, (state: any, action) => {
+      const { oldname, newname, index } = action.payload;
+      state.data[index] = { [newname]: state.data[index][oldname] };
     });
   },
 });

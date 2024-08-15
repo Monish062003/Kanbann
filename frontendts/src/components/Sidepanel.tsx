@@ -10,8 +10,10 @@ import {
   sidepanelHandle,
   removeWorkspaceDB,
   addWorkspaceDB,
+  updateWorkspaceDB,
 } from "../Slicers/slice";
 import { stat } from "fs";
+import { v4 as uuidv4 } from "uuid";
 
 // import { ToastContainer, toast } from "react-toastify";
 // import "react-toastify/dist/ReactToastify.css";
@@ -19,13 +21,14 @@ import { stat } from "fs";
 // import "animate.css";
 
 function Sidepanel() {
-  let totalbooleans: any = [];
+  let totalbooleans: any = [[], []];
   const [workspaces, setworkspaces] = useState<string[]>([]);
   const [displayworkspaces, setdisplayer] = useState({
     Individual: true,
     Group: false,
     iterations: true,
     spacehandler: [],
+    inputhandler: [],
   });
   const [group, showgroup] = useState(false);
   const [jgroup, showjgroup] = useState(false);
@@ -37,16 +40,20 @@ function Sidepanel() {
   const iterations = useSelector((state: any) => state.user_data_reducer.data);
 
   useEffect(() => {
-    const topLevelKeys = Object.keys(
-      data.reduce((acc: any, obj: any) => ({ ...acc, ...obj }), {})
+    const topLevelKeys = data.map(
+      (workspace: any) => Object.keys(workspace)[0]
     );
     setworkspaces(topLevelKeys);
+
     for (let index = 0; index < topLevelKeys.length; index++) {
-      totalbooleans.push(true);
+      totalbooleans[0].push(true);
+      totalbooleans[1].push("");
     }
+
     setdisplayer((prevDisplayWorkspaces) => ({
       ...prevDisplayWorkspaces,
-      spacehandler: totalbooleans,
+      spacehandler: totalbooleans[0],
+      inputhandler: totalbooleans[1],
     }));
   }, [data]);
 
@@ -66,76 +73,21 @@ function Sidepanel() {
         iterations: newIterations,
       };
     });
-    // const wholecontainer = document.querySelector(".side-container");
-    // const directbutton = document.querySelector(".sidedirect-button");
-    // const workspacegroup = document.querySelectorAll(".workspace-group");
-    // const workspacehandler = document.querySelectorAll(".workspacehandler");
-    // const cardcontainer = document.querySelector(".card-container");
-    // const innercontainer = document.querySelector(".innercontainer");
-    // const groups = document.querySelectorAll(".join-group");
-    // const isEvenIteration = iterations % 2 === 0;
-    // const posdown = document.getElementsByClassName('posdown')[0];
-    // for (let index = 0; index < workspacegroup.length; index++) {
-    //   workspacegroup[index].classList.toggle("sideopaquetext", isEvenIteration);
-    // }
-    // for (let index = 0; index < workspacehandler.length; index++) {
-    //   workspacehandler[index].classList.toggle("sideopaquetext", isEvenIteration);
-    // }
-    // for (let index = 0; index < groups.length; index++) {
-    //   groups[index].classList.toggle("sideopaquetext", isEvenIteration);
-    // }
-    // wholecontainer.classList.toggle("side-container-swipe", isEvenIteration);
-    // directbutton.classList.toggle("sidedirect-button-swipebutton", isEvenIteration);
-    // cardcontainer.classList.toggle("mincontainer", isEvenIteration);
-    // innercontainer.classList.toggle("mininnercontainer", isEvenIteration);
-    // try {
-    //     for (let index = 0; index < workspacegroup.length; index++) {
-    //       workspacegroup[index].classList.toggle("sideopaquetextinv", !isEvenIteration);
-    //     }
-    //     for (let index = 0; index < workspacehandler.length; index++) {
-    //       workspacehandler[index].classList.toggle("sideopaquetextinv", !isEvenIteration);
-    //     }
-    //     for (let index = 0; index < groups.length; index++) {
-    //       groups[index].classList.toggle("sideopaquetextinv", !isEvenIteration);
-    //     }
-    //   cardcontainer.classList.toggle("maxcontainer", !isEvenIteration);
-    //   innercontainer.classList.toggle("maxinnercontainer", !isEvenIteration);
-    //   wholecontainer.classList.toggle("side-container-swipeinv", !isEvenIteration);
-    //   directbutton.classList.toggle("sidedirect-button-swipebuttoninv", !isEvenIteration);
-    // } catch (error) {}
-    // iterations++;
   };
 
-  const remove = async (e: any) => {
-    if (e.target.tagName == "BUTTON") {
-      const wname = e.target.parentElement?.children[0].innerHTML;
+  const remove = async (event: any, index: number) => {
+    if (event.target.tagName == "BUTTON") {
+      const wname = event.target.parentElement?.children[0].innerHTML;
       setworkspaces((prevWorkspaces) =>
         prevWorkspaces.filter((workspace) => workspace !== wname)
       );
-      dispatch(removeWorkspaceDB({ id: Object_id, wname: wname }));
-      //   count--;
-      //   let title=e.target.parentElement.children[0].innerHTML?e.target.parentElement.children[0].innerHTML:e.target.parentElement.children[0].name;
-      //   axios.post("https://server-gray-omega.vercel.app/workspace",{
-      //     email:document.cookie.split("=")[1],
-      //     name:document.cookie.split("=")[0],
-      //     workspacename:title,
-      //     check:1,
-      //   })
-      //   let switchelem = e.target.parentElement.parentElement.children;
-      //   for (let index = 0; index < switchelem.length; index++) {
-      //     if (switchelem[index]==e.target.parentElement) {
-      //       if (index-1>=0 || switchelem.length==undefined) {
-      //         props.changestate(switchelem[index-1].children[0].innerHTML);
-      //       }
-      //       else if(index+1!=switchelem.length){
-      //         props.changestate(switchelem[index+1].children[0].innerHTML);
-      //       }
-      //       else{
-      //         props.changestate("lego batman is awesome")
-      //       }
-      //     }
-      //   }
-      //   e.target.parentElement.remove();
+      dispatch(
+        removeWorkspaceDB({
+          id: Object_id,
+          wname: wname,
+          wid: data[index][wname][data[index][wname].length - 1],
+        })
+      );
     }
   };
 
@@ -162,26 +114,40 @@ function Sidepanel() {
     // }
   };
 
-  const edit = async (index: number) => {
-    console.log(index);
-    setdisplayer((prevDisplayWorkspaces: any) => {
-      const updatedSpacehandler = [...prevDisplayWorkspaces.spacehandler];
-      updatedSpacehandler[index] = !updatedSpacehandler[index];
-      return {
-        ...prevDisplayWorkspaces,
-        spacehandler: updatedSpacehandler,
-      };
-    });
-    // if (e.target.tagName==="DIV") {
-    //   let textbox = document.createElement('input');
-    //   let workspace_name=e.target;
-    //   textbox.type = "text";
-    //   textbox.name = workspace_name.name;
-    //   textbox.classList.add('workspaceheading');
-    //   textbox.addEventListener('keypress',savetype);
-    //   workspace_name.parentElement.prepend(textbox);
-    //   workspace_name.remove();
-    // }
+  const edit = async (event: any, index: number) => {
+    if (event.target.tagName === "INPUT" && event.key !== "Enter") {
+      setdisplayer((prevDisplayWorkspaces) => {
+        const updatedInputhandler: any = [
+          ...prevDisplayWorkspaces.inputhandler,
+        ];
+        updatedInputhandler[index] = event.target.value;
+        return {
+          ...prevDisplayWorkspaces,
+          inputhandler: updatedInputhandler,
+        };
+      });
+    } else if (event.key === "Enter" || event.target.tagName === "DIV") {
+      if (event.key === "Enter")
+        dispatch(
+          updateWorkspaceDB({
+            id: Object_id,
+            wid: data[index][event.target.name][
+              data[index][event.target.name].length - 1
+            ],
+            newname: event.target.value,
+            oldname: event.target.name,
+            index,
+          })
+        );
+      setdisplayer((prevDisplayWorkspaces: any) => {
+        const updatedSpacehandler = [...prevDisplayWorkspaces.spacehandler];
+        updatedSpacehandler[index] = !updatedSpacehandler[index];
+        return {
+          ...prevDisplayWorkspaces,
+          spacehandler: updatedSpacehandler,
+        };
+      });
+    }
   };
 
   const changecardspanel = async (_event: any) => {
@@ -222,7 +188,7 @@ function Sidepanel() {
 
   const add = async () => {
     dispatch(
-      addWorkspaceDB({ id: Object_id, position: workspaces.length + 1 })
+      addWorkspaceDB({ id: Object_id, wid: uuidv4().replace(/-/g, "") })
     );
     // if (document.cookie.split("=")[1]) {
     //   let workspacetab=document.createElement('div');
@@ -344,11 +310,19 @@ function Sidepanel() {
                 }`}
               >
                 {displayworkspaces.spacehandler[index] ? (
-                  <div onDoubleClick={() => edit(index)}>{object}</div>
+                  <div onDoubleClick={(event) => edit(event, index)}>
+                    {object}
+                  </div>
                 ) : (
-                  <div onDoubleClick={() => edit(index)}>{"Baka"}</div>
+                  <input
+                    type="text"
+                    name={object}
+                    value={displayworkspaces.inputhandler[index]}
+                    onChange={(event) => edit(event, index)}
+                    onKeyDown={(event) => edit(event, index)}
+                  ></input>
                 )}
-                <button onClick={remove}>-</button>
+                <button onClick={(event) => remove(event, index)}>-</button>
               </div>
             );
           })}

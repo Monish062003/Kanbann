@@ -1,0 +1,112 @@
+@import url("https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap");
+
+.popup-size {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  align-items: center;
+  width: 45vw;
+  padding: 4vw 5vh;
+  height: max-content;
+  border: 1px solid #82e156;
+  border-radius: 15px;
+
+  h2 {
+    font-family: "Roboto", sans-serif;
+    font-weight: 600;
+    font-size: 1.7rem;
+  }
+
+  .popup-desc {
+    font-family: "Roboto", sans-serif;
+    font-weight: 400;
+  }
+
+  .validationbox {
+    margin-top: 5vh;
+    display: flex;
+    flex-direction: column;
+    gap: 5vh;
+    .otp-fields {
+      width: max-content;
+      display: flex;
+      gap: 2vw;
+
+      input {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border: 2px solid #9d59a8;
+        border-radius: 9px;
+        width: 3vw;
+        height: 3vw;
+      }
+    }
+
+    .otp-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 3vw;
+
+      #resend {
+        background-color: #82e156;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 1vh 1vw;
+      }
+
+      #validate {
+        background-color: #9d59a8;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 1vh 1vw;
+      }
+    }
+  }
+}
+
+.popup-pos {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100vw;
+  height: 100vh;
+}
+
+@media screen and (max-width: "640px") {
+  .popup-size {
+    width: 80vw;
+    height: 50vh;
+
+    h2 {
+      font-size: 1.2rem;
+    }
+
+    .popup-desc {
+      font-size: 0.8rem;
+    }
+
+    .validationbox {
+      display: flex;
+      align-items: center;
+
+      .otp-fields {
+        input {
+          width: 8vw;
+          height: 8vw;
+        }
+      }
+
+      .otp-buttons {
+        #resend,
+        #validate {
+          font-size: 0.8rem;
+          width: max-content;
+          padding: 1vh 3vw;
+        }
+      }
+    }
+  }
+}
