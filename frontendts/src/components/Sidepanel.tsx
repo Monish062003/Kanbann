@@ -316,6 +316,7 @@ function Sidepanel() {
                 ) : (
                   <input
                     type="text"
+                    className="text-black"
                     name={object}
                     value={displayworkspaces.inputhandler[index]}
                     onChange={(event) => edit(event, index)}

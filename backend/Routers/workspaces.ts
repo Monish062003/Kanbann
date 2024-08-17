@@ -64,37 +64,34 @@ workspace_router.post(
       fid: req.body.id,
     });
 
-    let windex: any;
-
-    oldcontents.filter((workspace: any, index: number) => {
+    for (let index = 0; index < oldcontents.length; index++) {
+      const workspace = oldcontents[index];
       if (Object.keys(workspace)[0] === req.body.wname) {
         if (
           workspace[req.body.wname][workspace[req.body.wname].length - 1] ===
           req.body.wid
         ) {
-          windex = index;
+          await datacollection.updateOne(
+            { fid: req.body.id },
+            {
+              $unset: {
+                [`data.${index}`]: 1,
+              },
+            }
+          );
+
+          await datacollection.updateOne(
+            { fid: req.body.id },
+            {
+              $pull: {
+                data: null,
+              },
+            }
+          );
+          break;
         }
       }
-    });
-
-    await datacollection.updateOne(
-      { fid: req.body.id },
-      {
-        $unset: {
-          [`data.${windex}`]: "",
-        },
-      }
-    );
-
-    await datacollection.updateOne(
-      { fid: req.body.id },
-      {
-        $pull: {
-          data: null,
-        },
-      }
-    );
-
+    }
     res.sendStatus(200);
   })
 );
