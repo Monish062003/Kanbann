@@ -2,12 +2,14 @@ import React, { useState, useEffect } from "react";
 import "../Css/card.scss";
 import Delete from "../Images/delete.png";
 // import Tasksection from "../components/tasksection";
-import axios from "axios";
 import { removeCardDB, updateCardDB } from "../Slicers/card_slice";
 
 export default function Card(props: any) {
   const dispatch = props.dispatch;
-  const [elementstate, setelementalstate] = useState(true);
+  const [elementstate, setelementalstate] = useState({
+    card_title: true,
+    card_description: true,
+  });
   let deletebtn = async () => {
     dispatch(
       removeCardDB({
@@ -18,7 +20,6 @@ export default function Card(props: any) {
       })
     );
   };
-  let refreshstopper = 0;
 
   const [tasks, setTasks] = useState([]);
 
@@ -77,9 +78,17 @@ export default function Card(props: any) {
     // ]);
   };
 
-  let savetype = async (event: any) => {
+  let savetype = async (event: any, element: string) => {
     if (event.keyCode == 13) {
-      setelementalstate(!elementstate);
+      element === "card_title"
+        ? setelementalstate({
+            ...elementstate,
+            ["card_title"]: !elementstate.card_title,
+          })
+        : setelementalstate({
+            ...elementstate,
+            ["card_description"]: !elementstate.card_description,
+          });
       dispatch(
         updateCardDB({
           id: props.Object_id,
@@ -88,6 +97,7 @@ export default function Card(props: any) {
           workspace_name: props.workspace[1],
           oldname: event.target.name,
           newname: event.target.value,
+          target: element,
         })
       );
     }
@@ -97,10 +107,15 @@ export default function Card(props: any) {
     <div>
       <div className="card">
         <div className="cardtitle">
-          {elementstate ? (
+          {elementstate.card_title ? (
             <div
               className="ctitle"
-              onDoubleClick={() => setelementalstate(!elementstate)}
+              onDoubleClick={() =>
+                setelementalstate({
+                  ...elementstate,
+                  ["card_title"]: !elementstate.card_title,
+                })
+              }
             >
               {props.title}
             </div>
@@ -109,18 +124,32 @@ export default function Card(props: any) {
               type="text"
               className="ctitleinpu"
               name={props.title}
-              onKeyDown={(event) => savetype(event)}
+              onKeyDown={(event) => savetype(event, "card_title")}
             ></input>
           )}
           <img src={Delete} alt="delete" onClick={deletebtn} />
         </div>
         <div className="carddesc">
-          <div
-            className="cdesc"
-            onDoubleClick={() => setelementalstate(!elementstate)}
-          >
-            {props.desc}
-          </div>
+          {elementstate.card_description ? (
+            <div
+              className="cdesc"
+              onDoubleClick={() =>
+                setelementalstate({
+                  ...elementstate,
+                  ["card_description"]: !elementstate.card_description,
+                })
+              }
+            >
+              {props.desc}
+            </div>
+          ) : (
+            <input
+              type="text"
+              className="ctitleinpu"
+              name={props.desc}
+              onKeyDown={(event) => savetype(event, "card_description")}
+            ></input>
+          )}
         </div>
         <div className="line"></div>
         <div className="carddatacontainer">

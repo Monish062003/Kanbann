@@ -15,7 +15,6 @@ export const addWorkspaceDB: any = createAsyncThunk(
 export const removeWorkspaceDB: any = createAsyncThunk(
   "removeWorkspace",
   async (objectid: any, thunkAPI) => {
-    console.log(objectid);
     await axios.post(
       "http://localhost:3090/workspaces/delete_workspace",
       objectid

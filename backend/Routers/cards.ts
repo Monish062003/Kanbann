@@ -32,21 +32,36 @@ card_router.post(
     const cardData =
       oldcontents[req.body.workspace_index][req.body.workspace_name][
         req.body.card_index
-      ][req.body.oldname];
-
-    await datacollection.updateOne(
-      { fid: req.body.id },
-      {
-        $set: {
-          [`data.${req.body.workspace_index}.${req.body.workspace_name}.${req.body.card_index}.${req.body.newname}`]:
-            cardData,
-        },
-        $unset: {
-          [`data.${req.body.workspace_index}.${req.body.workspace_name}.${req.body.card_index}.${req.body.oldname}`]:
-            "",
-        },
-      }
-    );
+      ];
+    if (req.body.target === "card_title") {
+      await datacollection.updateOne(
+        { fid: req.body.id },
+        {
+          $set: {
+            [`data.${req.body.workspace_index}.${req.body.workspace_name}.${req.body.card_index}.${req.body.newname}`]:
+              cardData[req.body.oldname],
+          },
+          $unset: {
+            [`data.${req.body.workspace_index}.${req.body.workspace_name}.${req.body.card_index}.${req.body.oldname}`]:
+              "",
+          },
+        }
+      );
+    } else {
+      console.log([Object.keys(cardData)[0]].length);
+      await datacollection.updateOne(
+        { fid: req.body.id },
+        {
+          $set: {
+            [`data.${req.body.workspace_index}.${req.body.workspace_name}.${
+              req.body.card_index
+            }.${Object.keys(cardData)[0]}.${
+              [Object.keys(cardData)[0]].length
+            }`]: req.body.newname,
+          },
+        }
+      );
+    }
     res.sendStatus(200);
   })
 );

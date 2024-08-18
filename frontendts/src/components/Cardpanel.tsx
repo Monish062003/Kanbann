@@ -2,7 +2,6 @@ import React, { useEffect, useState, useRef } from "react";
 import "../Css/card.scss";
 import Card from "./Card";
 // import Cookies from "js-cookie";
-import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
 import { addCardDB } from "../Slicers/card_slice";
 // import { ToastContainer, toast } from "react-toastify";

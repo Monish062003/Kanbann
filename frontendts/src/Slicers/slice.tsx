@@ -91,12 +91,24 @@ const user_data_slice = createSlice({
     });
 
     builder.addCase(updateCardDB.fulfilled, (state: any, action) => {
-      const { oldname, newname, workspace_index, card_index, workspace_name } =
-        action.payload;
-      state.data[workspace_index][workspace_name][card_index] = {
-        [newname]:
-          state.data[workspace_index][workspace_name][card_index][oldname],
-      };
+      const {
+        oldname,
+        newname,
+        workspace_index,
+        card_index,
+        workspace_name,
+        target,
+      } = action.payload;
+      const cardname = state.data[workspace_index][workspace_name][card_index];
+
+      target == "card_title"
+        ? (state.data[workspace_index][workspace_name][card_index] = {
+            [newname]:
+              state.data[workspace_index][workspace_name][card_index][oldname],
+          })
+        : (state.data[workspace_index][workspace_name][card_index][
+            Object.keys(cardname)[0]
+          ][cardname[Object.keys(cardname)[0]].length] = newname);
     });
   },
 });
