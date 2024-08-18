@@ -11,13 +11,10 @@ card_router.post(
       { fid: req.body.id },
       {
         $push: {
-          [`data.$[workspace].${req.body.wname}`]: {
-            "Card Name": [{ "Task 1": [] }, "Card Desc"],
+          [`data.${req.body.workspace_index}.${req.body.workspace_name}`]: {
+            "Card Name": [{ "Task 1": [] }, "Card Description"],
           },
         },
-      },
-      {
-        arrayFilters: [{ [`workspace.${req.body.wname}`]: { $exists: true } }],
       }
     );
 
@@ -32,21 +29,20 @@ card_router.post(
       fid: req.body.id,
     });
 
-    const cardData = oldcontents
-      ?.find((workspace: { [x: string]: any }) => workspace[req.body.wname])
-      ?.[req.body.wname]?.find(
-        (card: { [x: string]: any }) => card[req.body.oldname]
-      )?.[req.body.oldname];
+    const cardData =
+      oldcontents[req.body.workspace_index][req.body.workspace_name][
+        req.body.card_index
+      ][req.body.oldname];
 
     await datacollection.updateOne(
       { fid: req.body.id },
       {
         $set: {
-          [`data.${req.body.w_index}.${req.body.wname}.${req.body.c_index}.${req.body.newname}`]:
+          [`data.${req.body.workspace_index}.${req.body.workspace_name}.${req.body.card_index}.${req.body.newname}`]:
             cardData,
         },
         $unset: {
-          [`data.${req.body.w_index}.${req.body.wname}.${req.body.c_index}.${req.body.oldname}`]:
+          [`data.${req.body.workspace_index}.${req.body.workspace_name}.${req.body.card_index}.${req.body.oldname}`]:
             "",
         },
       }
@@ -62,7 +58,7 @@ card_router.post(
       { fid: req.body.id },
       {
         $unset: {
-          [`data.${req.body.w_index}.${req.body.wname}.${req.body.c_index}`]: 1,
+          [`data.${req.body.workspace_index}.${req.body.workspace_name}.${req.body.card_index}`]: 1,
         },
       }
     );
@@ -71,7 +67,7 @@ card_router.post(
       { fid: req.body.id },
       {
         $pull: {
-          data: null,
+          [`data.${req.body.workspace_index}.${req.body.workspace_name}`]: null,
         },
       }
     );

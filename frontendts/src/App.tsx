@@ -1,12 +1,17 @@
 import Navbar from "./components/Navbar";
 import Sidepanel from "./components/Sidepanel";
+import Cardpanel from "./components/Cardpanel";
+import "./App.css";
 
 function App() {
   return (
-    <div>
+    <>
       <Navbar />
-      <Sidepanel />
-    </div>
+      <div className="home">
+        <Sidepanel />
+        <Cardpanel />
+      </div>
+    </>
   );
 }
 

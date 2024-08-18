@@ -3,7 +3,7 @@ import "../Css/navbar.scss";
 import { auth, provider } from "../googleauth/login";
 import { signInWithPopup } from "firebase/auth";
 import { useAppDispatch } from "../Slicers/hooks";
-import { createuser, readuser } from "../Slicers/slice";
+import { createUser, readUser } from "../Slicers/users_slice";
 import cookie from "cookie";
 
 function Navbar(): JSX.Element {
@@ -14,7 +14,7 @@ function Navbar(): JSX.Element {
 
   useEffect(() => {
     if (cookie.parse(document.cookie).id != undefined) {
-      dispatch(readuser({ id: Object_id }));
+      dispatch(readUser({ id: Object_id }));
       setbtnname("Signout");
     }
   }, [cookie.parse(document.cookie).id]);
@@ -22,7 +22,7 @@ function Navbar(): JSX.Element {
   const Login = () => {
     signInWithPopup(auth, provider).then(async (data) => {
       dispatch(
-        createuser({ username: data.user.displayName, email: data.user.email })
+        createUser({ username: data.user.displayName, email: data.user.email })
       );
     });
   };

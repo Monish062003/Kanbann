@@ -1,8 +1,15 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
+import { createSlice } from "@reduxjs/toolkit";
 import cookie from "cookie";
+import { createUser, readUser } from "./users_slice";
+import {
+  addWorkspaceDB,
+  updateWorkspaceDB,
+  removeWorkspaceDB,
+} from "./workspace_slice";
 
-interface UserDetails {
+import { addCardDB, updateCardDB, removeCardDB } from "./card_slice";
+
+export interface UserDetails {
   username: string;
   email: string;
 }
@@ -12,6 +19,7 @@ interface initialInterface {
   data: any[];
   Object_id: string;
   transitions: any;
+  currentWorkspace: number;
 }
 
 const initialState: initialInterface = {
@@ -21,63 +29,8 @@ const initialState: initialInterface = {
   transitions: {
     sidebutton: true,
   },
+  currentWorkspace: 0,
 };
-
-export const createuser: any = createAsyncThunk(
-  "user_data/createuser",
-  async (user_details: UserDetails, thunkAPI) => {
-    const response = await axios.post(
-      "http://localhost:3090/users/create_user",
-      user_details
-    );
-    return response.data;
-  }
-);
-
-export const readuser: any = createAsyncThunk(
-  "user_data/readuser",
-  async (objectid: any, thunkAPI) => {
-    const response = await axios.post(
-      "http://localhost:3090/users/read_user",
-      objectid
-    );
-    return { data: response.data, Object_id: objectid };
-  }
-);
-
-export const addWorkspaceDB: any = createAsyncThunk(
-  "user_data/adduser",
-  async (objectid: any, thunkAPI) => {
-    await axios.post(
-      "http://localhost:3090/workspaces/create_workspace",
-      objectid
-    );
-    return objectid;
-  }
-);
-
-export const removeWorkspaceDB: any = createAsyncThunk(
-  "user_data/removeuser",
-  async (objectid: any, thunkAPI) => {
-    console.log(objectid);
-    await axios.post(
-      "http://localhost:3090/workspaces/delete_workspace",
-      objectid
-    );
-    return objectid;
-  }
-);
-
-export const updateWorkspaceDB: any = createAsyncThunk(
-  "user_data/updateuser",
-  async (objectid: any, thunkAPI) => {
-    await axios.post(
-      "http://localhost:3090/workspaces/update_workspace",
-      objectid
-    );
-    return objectid;
-  }
-);
 
 const user_data_slice = createSlice({
   name: "user_data",
@@ -86,9 +39,12 @@ const user_data_slice = createSlice({
     sidepanelHandle: (state, action) => {
       state.transitions.sidebutton = action.payload;
     },
+    changeCurrentWorkspace: (state, action) => {
+      state.currentWorkspace = action.payload;
+    },
   },
   extraReducers: (builder) => {
-    builder.addCase(createuser.fulfilled, (state, action) => {
+    builder.addCase(createUser.fulfilled, (state, action) => {
       state.userData = action.meta.arg;
       state.Object_id = action.payload;
       document.cookie = cookie.serialize("id", action.payload, {
@@ -96,7 +52,7 @@ const user_data_slice = createSlice({
         expires: new Date("9999-12-31T23:59:59Z"),
       });
     });
-    builder.addCase(readuser.fulfilled, (state, action) => {
+    builder.addCase(readUser.fulfilled, (state, action) => {
       state.data = action.payload.data;
       state.Object_id = action.payload.Object_id.id;
     });
@@ -118,8 +74,33 @@ const user_data_slice = createSlice({
       const { oldname, newname, w_index } = action.payload;
       state.data[w_index] = { [newname]: state.data[w_index][oldname] };
     });
+
+    builder.addCase(addCardDB.fulfilled, (state: any, action) => {
+      const { workspace_index, workspace_name } = action.payload;
+
+      state.data[workspace_index][workspace_name].push({
+        "Card Name": [{ "Task 1": [] }, "Card Description"],
+      });
+    });
+
+    builder.addCase(removeCardDB.fulfilled, (state: any, action) => {
+      const { workspace_index, card_index, workspace_name } = action.payload;
+      state.data[workspace_index][workspace_name] = state.data[workspace_index][
+        workspace_name
+      ].filter((_card: any, index: number) => index !== card_index);
+    });
+
+    builder.addCase(updateCardDB.fulfilled, (state: any, action) => {
+      const { oldname, newname, workspace_index, card_index, workspace_name } =
+        action.payload;
+      state.data[workspace_index][workspace_name][card_index] = {
+        [newname]:
+          state.data[workspace_index][workspace_name][card_index][oldname],
+      };
+    });
   },
 });
 
 export const user_data_reducer = user_data_slice.reducer;
-export const { sidepanelHandle } = user_data_slice.actions;
+export const { sidepanelHandle, changeCurrentWorkspace } =
+  user_data_slice.actions;

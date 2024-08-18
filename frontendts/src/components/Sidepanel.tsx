@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import "../Css/sidepanel.scss";
 import Sideswift from "../Images/downarrow.png";
 // import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -6,14 +6,12 @@ import Sideswift from "../Images/downarrow.png";
 // import JoinG from './JoinG'
 import { useAppDispatch } from "../Slicers/hooks";
 import { useSelector } from "react-redux";
+import { changeCurrentWorkspace, sidepanelHandle } from "../Slicers/slice";
 import {
-  sidepanelHandle,
-  removeWorkspaceDB,
   addWorkspaceDB,
   updateWorkspaceDB,
-} from "../Slicers/slice";
-import { stat } from "fs";
-
+  removeWorkspaceDB,
+} from "../Slicers/workspace_slice";
 // import { ToastContainer, toast } from "react-toastify";
 // import "react-toastify/dist/ReactToastify.css";
 // import { Bounce } from "react-toastify";
@@ -36,7 +34,7 @@ function Sidepanel() {
   const Object_id = useSelector(
     (state: any) => state.user_data_reducer.Object_id
   );
-  const iterations = useSelector((state: any) => state.user_data_reducer.data);
+  const iterations = data;
 
   useEffect(() => {
     const topLevelKeys = data.map(
@@ -123,18 +121,19 @@ function Sidepanel() {
     }
   };
 
-  const changecardspanel = async (_event: any) => {
+  const changecardspanel = async (event: any, index: number) => {
     // try {
-    //   if (event.target.tagName=="DIV") {
-    //     let elements = document.getElementsByClassName(event.target.className);
-    //     for (let index = 0; index < elements.length; index++) {
-    //       elements[index].style.background = "rgba(47, 48, 52, 0)"
-    //     }
-    //     event.target.style.background = "rgba(96, 89, 89, 0.66)"
-    //     let [workspace,title] = [event.target.className=="workspace-group"?event.target.children[0]:event.target,''];
-    //     title=workspace.name?workspace.name:workspace.innerHTML;
-    //     props.changestate(title)
-    //   }
+    if (event.target.tagName == "DIV") {
+      dispatch(changeCurrentWorkspace(index));
+      //     let elements = document.getElementsByClassName(event.target.className);
+      //     for (let index = 0; index < elements.length; index++) {
+      //       elements[index].style.background = "rgba(47, 48, 52, 0)"
+      //     }
+      //     event.target.style.background = "rgba(96, 89, 89, 0.66)"
+      //     let [workspace,title] = [event.target.className=="workspace-group"?event.target.children[0]:event.target,''];
+      //     title=workspace.name?workspace.name:workspace.innerHTML;
+      //     props.changestate(title)
+    }
     // } catch (error) {
     // }
   };
@@ -239,7 +238,10 @@ function Sidepanel() {
                 }`}
               >
                 {displayworkspaces.spacehandler[index] ? (
-                  <div onDoubleClick={(event) => edit(event, index)}>
+                  <div
+                    onDoubleClick={(event) => edit(event, index)}
+                    onClick={(event) => changecardspanel(event, index)}
+                  >
                     {object}
                   </div>
                 ) : (
