@@ -12,7 +12,7 @@ card_router.post(
       {
         $push: {
           [`data.$[workspace].${req.body.wname}`]: {
-            [`Card ${req.body.position}`]: [{ "Task 1": [] }],
+            "Card Name": [{ "Task 1": [] }, "Card Desc"],
           },
         },
       },
@@ -28,8 +28,11 @@ card_router.post(
 card_router.post(
   "/update_card",
   asyncHandler(async (req: Request, res: Response) => {
-    const { data } = await datacollection.findOne({ fid: req.body.id });
-    const cardData = data
+    const { data: oldcontents } = await datacollection.findOne({
+      fid: req.body.id,
+    });
+
+    const cardData = oldcontents
       ?.find((workspace: { [x: string]: any }) => workspace[req.body.wname])
       ?.[req.body.wname]?.find(
         (card: { [x: string]: any }) => card[req.body.oldname]
@@ -39,19 +42,13 @@ card_router.post(
       { fid: req.body.id },
       {
         $set: {
-          [`data.$[workspace].${req.body.wname}.$[card].${req.body.newname}`]:
+          [`data.${req.body.w_index}.${req.body.wname}.${req.body.c_index}.${req.body.newname}`]:
             cardData,
         },
         $unset: {
-          [`data.$[workspace].${req.body.wname}.$[card].${req.body.oldname}`]:
+          [`data.${req.body.w_index}.${req.body.wname}.${req.body.c_index}.${req.body.oldname}`]:
             "",
         },
-      },
-      {
-        arrayFilters: [
-          { [`workspace.${req.body.wname}`]: { $exists: true } },
-          { [`card.${req.body.oldname}`]: { $exists: true } },
-        ],
       }
     );
     res.sendStatus(200);
@@ -64,14 +61,18 @@ card_router.post(
     await datacollection.updateOne(
       { fid: req.body.id },
       {
-        $pull: {
-          [`data.$[workspace].${req.body.wname}`]: {
-            [req.body.cname]: { $exists: true },
-          },
+        $unset: {
+          [`data.${req.body.w_index}.${req.body.wname}.${req.body.c_index}`]: 1,
         },
-      },
+      }
+    );
+
+    await datacollection.updateOne(
+      { fid: req.body.id },
       {
-        arrayFilters: [{ [`workspace.${req.body.wname}`]: { $exists: true } }],
+        $pull: {
+          data: null,
+        },
       }
     );
     res.sendStatus(200);

@@ -101,18 +101,12 @@ const user_data_slice = createSlice({
       state.Object_id = action.payload.Object_id.id;
     });
     builder.addCase(removeWorkspaceDB.fulfilled, (state, action) => {
-      state.data = state.data.filter((workspace: any) => {
-        if (Object.keys(workspace)[0] === action.payload.wname) {
-          if (
-            workspace[action.payload.wname][
-              workspace[action.payload.wname].length - 1
-            ] !== action.payload.wid
-          ) {
-            return workspace;
-          }
-        } else {
+      state.data = state.data.filter((workspace: any, index: number) => {
+        if (
+          Object.keys(workspace)[0] !== action.payload.wname ||
+          action.payload.w_index !== index
+        )
           return workspace;
-        }
       });
     });
     builder.addCase(addWorkspaceDB.fulfilled, (state, action) => {
@@ -121,8 +115,8 @@ const user_data_slice = createSlice({
       });
     });
     builder.addCase(updateWorkspaceDB.fulfilled, (state: any, action) => {
-      const { oldname, newname, index } = action.payload;
-      state.data[index] = { [newname]: state.data[index][oldname] };
+      const { oldname, newname, w_index } = action.payload;
+      state.data[w_index] = { [newname]: state.data[w_index][oldname] };
     });
   },
 });

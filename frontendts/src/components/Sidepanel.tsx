@@ -13,7 +13,6 @@ import {
   updateWorkspaceDB,
 } from "../Slicers/slice";
 import { stat } from "fs";
-import { v4 as uuidv4 } from "uuid";
 
 // import { ToastContainer, toast } from "react-toastify";
 // import "react-toastify/dist/ReactToastify.css";
@@ -85,33 +84,10 @@ function Sidepanel() {
         removeWorkspaceDB({
           id: Object_id,
           wname: wname,
-          wid: data[index][wname][data[index][wname].length - 1],
+          w_index: index,
         })
       );
     }
-  };
-
-  const savetype = async (_e: any) => {
-    // if (e.keyCode==13) {
-    //   if (e.target.tagName=="INPUT") {
-    //     let title=e.target.value;
-    //     let workspace_name=e.target;
-    //     let name=e.target.name;
-    //     let workspace=e.target.parentElement;
-    //     workspace_name.remove();
-    //     let workspace_newname=document.createElement('div');
-    //     axios.post("https://server-gray-omega.vercel.app/workspace",{
-    //       email:document.cookie.split("=")[1],
-    //       check:2,
-    //       workspace_new:title,
-    //       workspacename:name
-    //     })
-    //     workspace_newname.addEventListener('dblclick',edit)
-    //     workspace_newname.innerHTML=title;
-    //     workspace_newname.name=title;
-    //     workspace.prepend(workspace_newname);
-    //   }
-    // }
   };
 
   const edit = async (event: any, index: number) => {
@@ -131,12 +107,9 @@ function Sidepanel() {
         dispatch(
           updateWorkspaceDB({
             id: Object_id,
-            wid: data[index][event.target.name][
-              data[index][event.target.name].length - 1
-            ],
+            w_index: index,
             newname: event.target.value,
             oldname: event.target.name,
-            index,
           })
         );
       setdisplayer((prevDisplayWorkspaces: any) => {
@@ -166,53 +139,9 @@ function Sidepanel() {
     // }
   };
 
-  const readwrite = (_name: any, _section: any) => {
-    // let workspacetab=document.createElement('div');
-    // let text=document.createElement('div');
-    // let button=document.createElement('button');
-    // let container=section==0?document.getElementsByClassName('workspacehandler')[0]:document.getElementsByClassName('workspacehandler')[1];
-    // count++;
-    // workspacetab.classList.add('workspace-group');
-    // text.name= name;
-    // text.addEventListener('dblclick',edit);
-    // text.innerHTML = name;
-    // button.innerHTML= " -";
-    // button.classList.add('.workspace-group');
-    // button.classList.add('button');
-    // button.addEventListener('click',remove);
-    // workspacetab.addEventListener('click',changecardspanel);
-    // container.appendChild(workspacetab);
-    // workspacetab.appendChild(text);
-    // workspacetab.appendChild(button);
-  };
-
   const add = async () => {
-    dispatch(
-      addWorkspaceDB({ id: Object_id, wid: uuidv4().replace(/-/g, "") })
-    );
+    dispatch(addWorkspaceDB({ id: Object_id }));
     // if (document.cookie.split("=")[1]) {
-    //   let workspacetab=document.createElement('div');
-    //   let text=document.createElement('div');
-    //   let button=document.createElement('button');
-    //   let container=document.getElementsByClassName('workspacehandler')[0];
-    //   count++;
-    //   workspacetab.classList.add('workspace-group');
-    //   text.name=`Workspace ${count}`;
-    //   text.addEventListener('dblclick',edit);
-    //   text.innerHTML = `Workspace ${count}`
-    //   button.innerHTML=" -";
-    //   button.classList.add('.workspace-group');
-    //   button.classList.add('button');
-    //   button.addEventListener('click',remove);
-    //   workspacetab.addEventListener('click',changecardspanel);a
-    //   container.appendChild(workspacetab);
-    //   workspacetab.appendChild(text);
-    //   workspacetab.appendChild(button);
-    //   axios.post("https://server-gray-omega.vercel.app/workspace",{
-    //     email:document.cookie.split("=")[1],
-    //     workspacename:text.innerHTML,
-    //     check:0,
-    //   })
     // }
     // else{
     //   toast.warn('Please Login to your Account')
