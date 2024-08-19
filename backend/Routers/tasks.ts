@@ -11,18 +11,15 @@ task_router.post(
       { fid: req.body.id },
       {
         $push: {
-          [`data.$[workspace].${req.body.wname}.$[card].${req.body.cname}`]: {
-            [`Task ${req.body.position}`]: [],
-          },
+          [`data.${req.body.workspace_index}.${req.body.workspace_name}.${req.body.card_index}.${req.body.card_name}`]:
+            {
+              $each: [{ "Sip A Coffee": [] }],
+              $position: req.body.task_index,
+            },
         },
-      },
-      {
-        arrayFilters: [
-          { [`workspace.${req.body.wname}`]: { $exists: true } },
-          { [`card.${req.body.cname}`]: { $exists: true } },
-        ],
       }
     );
+
     res.sendStatus(200);
   })
 );
@@ -34,20 +31,9 @@ task_router.post(
       { fid: req.body.id },
       {
         $set: {
-          [`data.$[workspace].${req.body.wname}.$[card].${req.body.cname}.$[task].${req.body.newname}`]:
-            [],
+          [`data.${req.body.workspace_index}.${req.body.workspace_name}.${req.body.card_index}.${req.body.card_name}.${req.body.task_index}`]:
+            { [req.body.newname]: [] },
         },
-        $unset: {
-          [`data.$[workspace].${req.body.wname}.$[card].${req.body.cname}.$[task].${req.body.oldname}`]:
-            "",
-        },
-      },
-      {
-        arrayFilters: [
-          { [`workspace.${req.body.wname}`]: { $exists: true } },
-          { [`card.${req.body.cname}`]: { $exists: true } },
-          { [`task.${req.body.oldname}`]: { $exists: true } },
-        ],
       }
     );
 
@@ -61,19 +47,22 @@ task_router.post(
     await datacollection.updateOne(
       { fid: req.body.id },
       {
-        $pull: {
-          [`data.$[workspace].${req.body.wname}.$[card].${req.body.cname}`]: {
-            [req.body.tname]: { $exists: true },
-          },
+        $unset: {
+          [`data.${req.body.workspace_index}.${req.body.workspace_name}.${req.body.card_index}.${req.body.card_name}.${req.body.task_index}`]: 1,
         },
-      },
-      {
-        arrayFilters: [
-          { [`workspace.${req.body.wname}`]: { $exists: true } },
-          { [`card.${req.body.cname}`]: { $exists: true } },
-        ],
       }
     );
+
+    await datacollection.updateOne(
+      { fid: req.body.id },
+      {
+        $pull: {
+          [`data.${req.body.workspace_index}.${req.body.workspace_name}.${req.body.card_index}.${req.body.card_name}`]:
+            null,
+        },
+      }
+    );
+
     res.sendStatus(200);
   })
 );

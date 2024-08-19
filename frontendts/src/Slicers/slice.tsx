@@ -8,6 +8,7 @@ import {
 } from "./workspace_slice";
 
 import { addCardDB, updateCardDB, removeCardDB } from "./card_slice";
+import { addTaskDB, updateTaskDB, removeTaskDB } from "./task_slice";
 
 export interface UserDetails {
   username: string;
@@ -109,6 +110,33 @@ const user_data_slice = createSlice({
         : (state.data[workspace_index][workspace_name][card_index][
             Object.keys(cardname)[0]
           ][cardname[Object.keys(cardname)[0]].length] = newname);
+    });
+    builder.addCase(addTaskDB.fulfilled, (state: any, action) => {
+      const { workspace_index, workspace_name, card_index, card_name } =
+        action.payload;
+
+      state.data[workspace_index][workspace_name][card_index][card_name].splice(
+        state.data[workspace_index][workspace_name][card_index][card_name]
+          .length - 1,
+        0,
+        {
+          "Sip A Coffee": [],
+        }
+      );
+    });
+    builder.addCase(removeTaskDB.fulfilled, (state: any, action) => {
+      const {
+        workspace_index,
+        workspace_name,
+        card_index,
+        card_name,
+        task_index,
+      } = action.payload;
+
+      state.data[workspace_index][workspace_name][card_index][card_name] =
+        state.data[workspace_index][workspace_name][card_index][
+          card_name
+        ].filter((_task: any, index: number) => index !== task_index);
     });
   },
 });
