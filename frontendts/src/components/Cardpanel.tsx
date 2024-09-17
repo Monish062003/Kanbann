@@ -79,11 +79,21 @@ function Cardpanel() {
 
   useEffect(() => {
     try {
-      setCards(
-        data[current_workspace][Object.keys(data[current_workspace])[0]]
-      );
-    } catch (error) {}
-  }, [current_workspace, AddCard]);
+      if (data.length !== 0 && current_workspace !== null) {
+        setCards(
+          data[current_workspace][Object.keys(data[current_workspace])[0]]
+        );
+      }
+    } catch (error) {
+      // if (current_workspace - 1 > 0) {
+      //   setCards(
+      //     data[current_workspace - 1][
+      //       Object.keys(data[current_workspace - 1])[0]
+      //     ]
+      //   );
+      // }
+    }
+  }, [current_workspace, AddCard, data]);
 
   // useEffect(() => {
   //   if (refreshstopper == 0) {
@@ -160,25 +170,26 @@ function Cardpanel() {
         {cards.map((card: any, index) => {
           return (
             <div className="stylediv" key={index}>
-              <Card
-                title={Object.keys(card)[0]}
-                desc={
-                  card[Object.keys(card)[0]][
-                    card[Object.keys(card)[0]].length - 1
-                  ]
-                }
-                tasks={card[Object.keys(card)[0]]}
-                workspace={[
-                  current_workspace,
-                  Object.keys(data[current_workspace])[0],
-                ]}
-                usingstate={cards}
-                changestate={setCards}
-                card_index={index}
-                dispatch={dispatch}
-                Object_id={Object_id}
-              />
-              ,
+              {current_workspace !== null && (
+                <Card
+                  title={Object.keys(card)[0]}
+                  desc={
+                    card[Object.keys(card)[0]][
+                      card[Object.keys(card)[0]].length - 1
+                    ]
+                  }
+                  tasks={card[Object.keys(card)[0]]}
+                  workspace={[
+                    current_workspace,
+                    Object.keys(data?.[current_workspace])[0],
+                  ]}
+                  usingstate={cards}
+                  changestate={setCards}
+                  card_index={index}
+                  dispatch={dispatch}
+                  Object_id={Object_id}
+                />
+              )}
             </div>
           );
         })}

@@ -8,6 +8,7 @@ import { user_router } from "./Routers/users";
 import { workspace_router } from "./Routers/workspaces";
 import { card_router } from "./Routers/cards";
 import { task_router } from "./Routers/tasks";
+import { group_router } from "./Routers/groups";
 
 const parser: any = dotenv.config().parsed;
 const app: Application = express();
@@ -21,6 +22,7 @@ connectToDatabase().then(() => {
   app.use("/workspaces", workspace_router);
   app.use("/cards", card_router);
   app.use("/tasks", task_router);
+  app.use("/groups", group_router);
 
   app.listen(PORT, () => {
     console.log(`Listen to http://localhost:${PORT}/`);

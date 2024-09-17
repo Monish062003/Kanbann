@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import "../Css/sidepanel.scss";
 import Sideswift from "../Images/downarrow.png";
 // import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-// import Group from './Group'
+import Group from "./Group";
 // import JoinG from './JoinG'
 import { useAppDispatch } from "../Slicers/hooks";
 import { useSelector } from "react-redux";
@@ -19,7 +19,10 @@ import {
 
 function Sidepanel() {
   let totalbooleans: any = [[], []];
-  const [workspaces, setworkspaces] = useState<string[]>([]);
+  const [workspaces, setworkspaces] = useState<any>({
+    individual: [],
+    groups: [],
+  });
   const [displayworkspaces, setdisplayer] = useState({
     Individual: true,
     Group: false,
@@ -30,19 +33,32 @@ function Sidepanel() {
   const [group, showgroup] = useState(false);
   const [jgroup, showjgroup] = useState(false);
   const dispatch = useAppDispatch();
-  const data: any = useSelector((state: any) => state.user_data_reducer.data);
+  let data: any = useSelector((state: any) => state.user_data_reducer.data);
+  let groupdata: any = useSelector(
+    (state: any) => state.user_data_reducer.groupdata
+  );
+  let current_workspace: number | null = useSelector(
+    (state: any) => state.user_data_reducer.currentWorkspace
+  );
   const Object_id = useSelector(
     (state: any) => state.user_data_reducer.Object_id
   );
   const iterations = data;
 
   useEffect(() => {
-    const topLevelKeys = data.map(
+    const IndividualKeys = data.map(
       (workspace: any) => Object.keys(workspace)[0]
     );
-    setworkspaces(topLevelKeys);
+    const GroupKeys = groupdata.map(
+      (workspace: any) => Object.keys(workspace)[0]
+    );
+    setworkspaces({
+      ...workspaces,
+      ["individual"]: IndividualKeys,
+      ["groups"]: GroupKeys,
+    });
 
-    for (let index = 0; index < topLevelKeys.length; index++) {
+    for (let index = 0; index < IndividualKeys.length; index++) {
       totalbooleans[0].push(true);
       totalbooleans[1].push("");
     }
@@ -75,9 +91,23 @@ function Sidepanel() {
   const remove = async (event: any, index: number) => {
     if (event.target.tagName == "BUTTON") {
       const wname = event.target.parentElement?.children[0].innerHTML;
-      setworkspaces((prevWorkspaces) =>
-        prevWorkspaces.filter((workspace) => workspace !== wname)
+      const removeIndividualWorksapce = workspaces.individual.filter(
+        (prevWorkspaces: any[]) =>
+          prevWorkspaces.filter((workspace) => workspace !== wname)
       );
+      setworkspaces({
+        ...workspaces,
+        ["individual"]: removeIndividualWorksapce,
+      });
+      if (current_workspace === index) {
+        if (workspaces.length > 1) {
+          index === 0
+            ? dispatch(changeCurrentWorkspace(index))
+            : dispatch(changeCurrentWorkspace(index - 1));
+        } else {
+          dispatch(changeCurrentWorkspace(null));
+        }
+      }
       dispatch(
         removeWorkspaceDB({
           id: Object_id,
@@ -147,23 +177,23 @@ function Sidepanel() {
     // }
   };
 
-  //   const create_group = () =>{
-  //     if (document.cookie.split("=")[1]) {
-  //       showgroup(true)
-  //     }
-  //     else{
-  //       toast.warn('Please Login to your Account')
-  //     }
-  //   }
+  const create_group = () => {
+    if (Object_id) {
+      showgroup(true);
+    }
+    // else{
+    //   toast.warn('Please Login to your Account')
+    // }
+  };
 
-  //   const join_group = () =>{
-  //     if (document.cookie.split("=")[1]) {
-  //       showjgroup(true)
-  //     }
-  //     else{
-  //       toast.warn('Please Login to your Account')
-  //     }
-  //   }
+  const join_group = () => {
+    // if (document.cookie.split("=")[1]) {
+    //   showjgroup(true)
+    // }
+    // else{
+    //   toast.warn('Please Login to your Account')
+    // }
+  };
 
   const call_groups = (_event: any) => {
     //   let targeted = event.target;
@@ -227,7 +257,7 @@ function Sidepanel() {
           }`}
           style={{ display: displayworkspaces.Individual ? "none" : "block" }}
         >
-          {workspaces.map((object: any, index: any) => {
+          {workspaces.individual.map((object: any, index: any) => {
             return (
               <div
                 key={index}
@@ -284,6 +314,46 @@ function Sidepanel() {
               ? "sideopaquetextinv"
               : "sideopaquetext"
           }`}
+          style={{ display: displayworkspaces.Individual ? "none" : "block" }}
+        >
+          {workspaces.groups.map((object: any, index: any) => {
+            return (
+              <div
+                key={index}
+                className={`workspace-group ${
+                  displayworkspaces.iterations
+                    ? "sideopaquetextinv"
+                    : "sideopaquetext"
+                }`}
+              >
+                {displayworkspaces.spacehandler[index] ? (
+                  <div
+                    onDoubleClick={(event) => edit(event, index)}
+                    onClick={(event) => changecardspanel(event, index)}
+                  >
+                    {object}
+                  </div>
+                ) : (
+                  <input
+                    type="text"
+                    className="text-black"
+                    name={object}
+                    value={displayworkspaces.inputhandler[index]}
+                    onChange={(event) => edit(event, index)}
+                    onKeyDown={(event) => edit(event, index)}
+                  ></input>
+                )}
+                <button onClick={(event) => remove(event, index)}>-</button>
+              </div>
+            );
+          })}
+        </div>
+        <div
+          className={`workspacehandler ${
+            displayworkspaces.iterations
+              ? "sideopaquetextinv"
+              : "sideopaquetext"
+          }`}
         ></div>
       </div>
       <span className="posdown">
@@ -297,11 +367,21 @@ function Sidepanel() {
         >
           Add a Workspace &nbsp;&nbsp;&nbsp;<button onClick={add}>+</button>
         </div>
-        {/* <div className="group-panel">
-          <div className="join-group" style={{borderTop:"1px solid white"}} onClick={create_group}>Create a Group <i className="fa-solid fa-user-group fa-sm"></i></div>
-          <div className="join-group" onClick={join_group}>Join a Group <i className="fa-solid fa-users fa-sm"></i></div>
-        </div> */}
+        <div className="group-panel">
+          <div
+            className="join-group"
+            style={{ borderTop: "1px solid white" }}
+            onClick={create_group}
+          >
+            Create a Group <i className="fa-solid fa-user-group fa-sm"></i>
+          </div>
+          <div className="join-group" onClick={join_group}>
+            Join a Group <i className="fa-solid fa-users fa-sm"></i>
+          </div>
+        </div>
       </span>
+      {group && <Group boarddisplay={showgroup} />}
+      {jgroup && <Group />}
       {/* {group && <Group boarddisplay={showgroup} edit={edit} remove={remove} changecardspanel={changecardspanel} />}
       {jgroup && <JoinG boarddisplay={showjgroup} edit={edit} remove={remove} changecardspanel={changecardspanel} />} */}
       {/* <ToastContainer

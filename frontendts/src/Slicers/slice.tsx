@@ -9,6 +9,7 @@ import {
 
 import { addCardDB, updateCardDB, removeCardDB } from "./card_slice";
 import { addTaskDB, updateTaskDB, removeTaskDB } from "./task_slice";
+import { createGroup, joinGroup } from "./groups_slice";
 
 export interface UserDetails {
   username: string;
@@ -18,6 +19,7 @@ export interface UserDetails {
 interface initialInterface {
   userData: UserDetails;
   data: any[];
+  groupdata: any[];
   Object_id: string;
   transitions: any;
   currentWorkspace: number;
@@ -26,6 +28,7 @@ interface initialInterface {
 const initialState: initialInterface = {
   userData: { username: "", email: "" },
   data: [],
+  groupdata: [],
   Object_id: "",
   transitions: {
     sidebutton: true,
@@ -54,7 +57,8 @@ const user_data_slice = createSlice({
       });
     });
     builder.addCase(readUser.fulfilled, (state, action) => {
-      state.data = action.payload.data;
+      state.data = action.payload.data.individual;
+      state.groupdata = action.payload.data.groups;
       state.Object_id = action.payload.Object_id.id;
     });
     builder.addCase(removeWorkspaceDB.fulfilled, (state, action) => {
@@ -68,7 +72,9 @@ const user_data_slice = createSlice({
     });
     builder.addCase(addWorkspaceDB.fulfilled, (state, action) => {
       state.data.push({
-        Workspace: [{ "Card 1": [{ "Task 1": [] }] }, action.payload.wid],
+        Workspace: [
+          { "Card Name": [{ "Drink Lemonade": [] }, "Card Description"] },
+        ],
       });
     });
     builder.addCase(updateWorkspaceDB.fulfilled, (state: any, action) => {
@@ -80,7 +86,7 @@ const user_data_slice = createSlice({
       const { workspace_index, workspace_name } = action.payload;
 
       state.data[workspace_index][workspace_name].push({
-        "Card Name": [{ "Task 1": [] }, "Card Description"],
+        "Card Name": [{ "Do Yoga": [] }, "Card Description"],
       });
     });
 
@@ -101,7 +107,6 @@ const user_data_slice = createSlice({
         target,
       } = action.payload;
       const cardname = state.data[workspace_index][workspace_name][card_index];
-
       target == "card_title"
         ? (state.data[workspace_index][workspace_name][card_index] = {
             [newname]:
@@ -109,7 +114,7 @@ const user_data_slice = createSlice({
           })
         : (state.data[workspace_index][workspace_name][card_index][
             Object.keys(cardname)[0]
-          ][cardname[Object.keys(cardname)[0]].length] = newname);
+          ][cardname[Object.keys(cardname)[0]].length - 1] = newname);
     });
     builder.addCase(addTaskDB.fulfilled, (state: any, action) => {
       const { workspace_index, workspace_name, card_index, card_name } =
@@ -123,6 +128,20 @@ const user_data_slice = createSlice({
           "Sip A Coffee": [],
         }
       );
+    });
+    builder.addCase(updateTaskDB.fulfilled, (state: any, action) => {
+      const {
+        workspace_index,
+        workspace_name,
+        card_index,
+        card_name,
+        task_index,
+        newname,
+      } = action.payload;
+
+      state.data[workspace_index][workspace_name][card_index][card_name][
+        task_index
+      ] = { [newname]: [] };
     });
     builder.addCase(removeTaskDB.fulfilled, (state: any, action) => {
       const {

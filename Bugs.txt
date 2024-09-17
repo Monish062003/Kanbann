@@ -1,0 +1,16 @@
+
+Problems :
+1.On Updating the Card Description, a new Task Gets added in the Card Section but on refresh it goes away 
+2.On adding a new Workspace/deleting the same and switching to it, it returns an error, "Cannot convert undefined or null to object"
+3. On Updating a task, and switching and reverting back from the next workspace, it returns the same oldvalue. Issues in Frontend
+
+
+
+Solution:
+1.Issues might be affiliated with Frontend Only, coz data gets store perfectly in Backend, Check the builders of Card Desc Update
+2. On Refresh the problem gets resolved. There might be problems in frontend itself
+3. Same as the 2nd Point, work on the Frontend
+
+
+Solved:
+1. 2. 3.

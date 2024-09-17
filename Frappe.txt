@@ -1,0 +1,25 @@
+Frappe Commands:
+
+Bench Directory(frappe-bench) Initialization:
+    bench init frappe-bench
+
+App installation in Frappe:
+    bench new-app appname
+
+Site installation in Frappe:
+    bench new-site sitename
+
+Site uninstallation in Frappe:
+    bench drop-site sitename
+
+Adding the app in the site:
+    bench --site sitename install-app appname
+
+Removing the app from the site:
+    bench --site sitename uninstall-app appname
+
+Make the Site as the default current site:
+    bench use sitename
+
+Migrate the site:
+    bench --site sitename migrate
