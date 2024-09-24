@@ -13,6 +13,8 @@ function Testimonials() {
     setVideos(videoArray);
   }, [videoList]);
 
+  useEffect(() => {}, [Left, Right]);
+
   function Left() {
     let videoArray = [...Videos];
     for (let index = 0; index < videoList.length; index++) {
@@ -52,10 +54,14 @@ function Testimonials() {
           Left
         </button>
         <div className="videopanel">
-          {Videos.map((video) => (
+          {Videos.map((video, index) => (
             <video
               key={video.id}
-              className="videoframe"
+              className={
+                index === Math.floor(Videos.length / 2)
+                  ? "mainframe"
+                  : "videoframe"
+              }
               src={video.src}
               title={video.title}
               controls
