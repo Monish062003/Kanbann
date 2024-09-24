@@ -1,63 +1,60 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap");
 
-.testimonials-section{
-    width: 100vw;
-    margin-top: 3vh;
-    height: max-content;
+.testimonials-section {
+  width: 100vw;
+  margin-top: 3vh;
+  height: max-content;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-family: "Inter", sans-serif;
+
+  h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    padding-bottom: 2vh;
+  }
+
+  p {
+    font-weight: 600;
+  }
+
+  .video-section {
     display: flex;
-    flex-direction: column;
+    justify-content: center;
     align-items: center;
-    font-family: "Inter", sans-serif;
+    gap: 3vw;
 
-    h1{
-        font-size: 2rem;
-        font-weight: 700;
-        padding-bottom: 2vh;
+    .videopanel {
+      margin-top: 2vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 57vw;
+      gap: 3vw;
+      height: 60vh;
+
+      div {
+        gap: 5vw;
+      }
+      .videoframe {
+        background-color: #ffafaf;
+        width: 17vw;
+        height: 50vh;
+      }
+
+      .mainframe {
+        background-color: #ffafaf;
+        width: 17vw;
+        height: 55vh;
+      }
     }
-
-    p{
-        font-weight: 600;
+    .nav-buttons {
+      height: max-content;
+      padding: 1vh 1vw;
+      border-radius: 10px;
+      background-color: #ffafaf;
+      color: white;
     }
-
-    .video-section{
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        gap: 3vw;
-
-        .videopanel{
-            margin-top: 2vh;
-            display: flex;
-            justify-content: center;
-            border: 1px solid black;
-            align-items: center;
-            width: 57vw;
-            gap: 3vw;
-            height: 60vh;
-    
-            div{
-                gap: 5vw;
-            }
-            .videoframe{
-                background-color: #FFAFAF;
-                width: 17vw;
-                height: 50vh;
-            }
-    
-            .mainframe{
-                background-color: #FFAFAF;
-                width: 17vw;
-                height: 55vh;
-            }
-    
-        }
-        .nav-buttons{
-            height: max-content;
-            padding: 1vh 1vw;
-            border-radius: 10px;
-            background-color: #FFAFAF;
-            color: white;
-        }
-    }
-
+  }
 }
