@@ -16,54 +16,60 @@ function Testimonials() {
 
   function Left() {
     let firstVideo = Videos[0].title;
-    let videoArray = [];
-    let targetedIndex = -1;
+    setVideos(Videos.slice(1));
 
-    for (let index = 0; index < videoList.length; index++) {
-      const element = videoList[index];
-      if (element.title === firstVideo) {
-        targetedIndex = index + 1;
-        break;
-      }
-    }
-    while (videoArray.length < 3) {
-      if (targetedIndex >= videoList.length) {
-        targetedIndex = 0;
-      }
+    // let videoArray = [];
+    // let targetedIndex = -1;
 
-      videoArray.push(videoList[targetedIndex]);
-      targetedIndex++;
-    }
+    // for (let index = 0; index < videoList.length; index++) {
+    //   const element = videoList[index];
+    //   if (element.title === firstVideo) {
+    //     targetedIndex = index;
+    //     break;
+    //   }
+    // }
+    // while (videoArray.length < 3) {
+    //   if (targetedIndex >= videoList.length) {
+    //     targetedIndex = 0;
+    //   }
+    //   console.log(targetedIndex)
+    //   videoArray.push(videoList[targetedIndex]);
+    //   targetedIndex++;
+    // }
 
-    setVideos(videoArray);
+    // setVideos(videoArray);
   }
 
   function Right() {
-    let firstVideo = Videos[2].title;
+    setVideos(Videos.slice(0, 2));
+    console.log(Videos)
     let videoArray = [];
-    let targetedIndex = -1;
+    let targetedIndex;
 
     for (let index = 0; index < videoList.length; index++) {
       const element = videoList[index];
-      if (element.title === firstVideo) {
-        targetedIndex = index;
+      if (element.title === Videos[0].title) {
+        if (index - 1 > 0) {
+          
+        }
         break;
       }
     }
-    while (videoArray.length < 3) {
-      if (targetedIndex < 0) {
-        targetedIndex = videoList.length - 1;
-      }
-      videoArray.push(videoList[targetedIndex]);
-      targetedIndex--;
-    }
-    console.log(videoArray);
-    let newVideoArray = [];
-    for (let index = videoArray.length - 1; index > -1; index--) {
-      console.log(index);
-      newVideoArray.push(videoArray[index]);
-    }
-    setVideos(videoArray);
+    // while (videoArray.length < 3) {
+    //   if (targetedIndex < 0) {
+    //     targetedIndex = videoList.length - 1;
+    //   }
+    //   console.log(targetedIndex)
+    //   videoArray.push(videoList[targetedIndex]);
+    //   targetedIndex--;
+    // }
+    // console.log(videoArray);
+    // let newVideoArray = [];
+    // for (let index = videoArray.length - 1; index > -1; index--) {
+    //   console.log(index);
+    //   newVideoArray.push(videoArray[index]);
+    // }
+    // setVideos(videoArray);
   }
   return (
     <div className="testimonials-section">
