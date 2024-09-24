@@ -1,16 +1,13 @@
 import Navbar from "./components/Navbar";
 import Sidepanel from "./components/Sidepanel";
 import Cardpanel from "./components/Cardpanel";
+import Testimonials from "./components/Testimonials";
 import "./App.css";
 
 function App() {
   return (
     <>
-      <Navbar />
-      <div className="home">
-        <Sidepanel />
-        <Cardpanel />
-      </div>
+      <Testimonials />
     </>
   );
 }
