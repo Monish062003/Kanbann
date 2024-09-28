@@ -81,17 +81,24 @@
 
     @keyframes leftanimation {
       from {
+        position: relative;
+        left: 0vw;
       }
       to {
+        position: relative;
+        left: 40vw;
       }
     }
 
     @keyframes middleanimation {
       from {
         width: $mainpanelsize;
+        position: relative;
+        left: 0vw;
       }
       to {
         width: $videopanelsize;
+        left: -20vw;
       }
     }
 
@@ -104,15 +111,21 @@
       to {
         width: $mainpanelsize;
         position: relative;
-        right: 20vw;
+        right: 40vw;
       }
     }
 
     .animateleft {
       animation: leftanimation 1s ease-in-out 0s 1 forwards;
+      width: $videopanelsize;
+      position: relative;
+      left: 40vw;
     }
 
     .animatemiddle {
+      animation: middleanimation 1s ease-in-out 0s 1 forwards;
+      position: relative;
+      left: -17.5vw;
     }
 
     .animateright {
