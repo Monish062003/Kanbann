@@ -12,43 +12,24 @@ function Testimonials() {
   const [videoIterator, setIterator] = useState(0);
   const [animator, setAnimator] = useState([
     {
-      fromValue: 20,
-      fromSign: "-",
-      toValue: 40,
-      toSign: "-",
+      fromValue: 0,
+      fromSign: "",
+      toValue: 0,
+      toSign: "",
     },
     {
-      fromValue: 20,
-      fromSign: "-",
-      toValue: 40,
-      toSign: "-",
+      fromValue: 0,
+      fromSign: "",
+      toValue: 0,
+      toSign: "",
     },
     {
-      fromValue: 20,
-      fromSign: "-",
-      toValue: 40,
-      toSign: "-",
+      fromValue: 0,
+      fromSign: "",
+      toValue: 0,
+      toSign: "",
     },
   ]);
-
-  let animationClass = `
-  @keyframes panelanimation {
-    from {
-      position:relative;
-      left:${animator[0].fromSign}${animator[0].fromValue}vw;
-    }
-    to {
-      position:relative;
-      left:${animator[0].toSign}${animator[0].toValue}vw;
-    }
-  }
-
-  .animate-panel {
-    animation: panelanimation 1s ease-in-out forwards;
-    position:relative;
-    left:${animator[0].toSign}${animator[0].toValue}vw;
-  }
-`;
 
   useEffect(() => {
     let videoArray = [];
@@ -73,65 +54,125 @@ function Testimonials() {
     setVideos(videoArray);
   }, [videoList]);
 
-  function Left() {
-    let videoArray = [...Videos];
-    const classAnimations = ["animateright", "animatemiddle", "animateleft"];
-    const video_elements = document.getElementsByClassName("panel-item");
-    classAnimations.map((classname, index) => {
-      if (!video_elements[index].classList[1]) {
-        video_elements[index].classList.remove("animate-panel");
-        switch (index) {
-          case 0:
-            setAnimator((prevAnimator) => [
-              {
-                ...prevAnimator[0],
-                fromValue: 0,
-                fromSign: "",
-                toValue: 20,
-                toSign: "-",
-              },
-              ...prevAnimator.slice(1),
-            ]);
+  useEffect(() => {
+    console.log(videoIterator);
+  }, [videoIterator]);
 
-            break;
-          case 1:
-            // setAnimator((prevAnimator) => [
-            //   {
-            //     ...prevAnimator[0],
-            //     fromValue: newFromValue,
-            //     fromSign: newFromSign,
-            //     toValue: newToValue,
-            //     toSign: newToSign,
-            //   },
-            //   ...prevAnimator.slice(1),
-            // ]);
+  useEffect(() => {
+    const videoElements = document.getElementsByClassName("panel-item");
+    console.log(animator);
+    animator.forEach((values, index) => {
+      const animationId = `panelanimation-${index}-${Date.now()}`;
+      videoElements[index]?.classList.remove("animate-panel");
 
-            console.log(animationClass);
-
-            break;
-          case 2:
-            break;
-        }
-        video_elements[index].classList.add("animate-panel");
-        const styleSheet = document.createElement("style");
-        styleSheet.innerHTML = animationClass;
-        document.head.appendChild(styleSheet);
+      const oldStyle = document.getElementById(animationId);
+      if (oldStyle) {
+        oldStyle.remove();
       }
+
+      const animationClass = `
+        @keyframes ${animationId} {
+          from {
+            position: relative;
+            left: ${values.fromSign}${values.fromValue}vw;
+          }
+          to {
+            position: relative;
+            left: ${values.toSign}${values.toValue}vw;
+          }
+        }
+  
+        .animate-panel-${index} {
+          animation: ${animationId} 1s ease-in-out forwards;
+          position: relative;
+          left: ${values.toSign}${values.toValue}vw;
+        }
+      `;
+
+      const styleSheet = document.createElement("style");
+      styleSheet.id = animationId; // Set an ID to remove it later
+      styleSheet.innerHTML = animationClass;
+      document.head.appendChild(styleSheet);
+
+      void videoElements[index]?.offsetWidth;
+
+      videoElements[index]?.classList.add(`animate-panel-${index}`);
     });
+  }, [animator]);
+
+  function Left() {
+    setAnimator((prevAnimator) =>
+      prevAnimator.map((anim, i) => {
+        switch (i) {
+          case 0:
+            return {
+              ...anim,
+              fromValue: anim.toValue,
+              fromSign: `${anim.toSign}`,
+              toValue: anim.toValue === 40 ? 20 : anim.toValue === 20 ? 0 : 40,
+              toSign: ``,
+            };
+
+          case 1:
+            return {
+              ...anim,
+              fromValue: anim.toValue,
+              fromSign: `${anim.toSign}`,
+              toValue: anim.toValue === 0 ? 20 : anim.toSign === "" ? 0 : 20,
+              toSign: anim.toValue === 0 ? "-" : "",
+            };
+
+          case 2:
+            return {
+              ...anim,
+              fromValue: anim.toValue,
+              fromSign: `${anim.toSign}`,
+              toValue: anim.toValue === 40 ? 0 : anim.toValue === 20 ? 40 : 20,
+              toSign: anim.toValue === 0 ? "-" : anim.toSign === "-" ? "-" : "",
+            };
+        }
+      })
+    );
+    setIterator(1 + videoIterator >= animator.length ? 0 : 1 + videoIterator);
   }
 
   function Right() {
-    let videoArray = [...Videos];
-    for (let index = 0; index < videoList.length; index++) {
-      const element = videoList[index];
-      if (element.title === Videos[0].title) {
-        videoArray.unshift(
-          videoList[index - 1 < 0 ? videoList.length - 1 : index - 1]
-        );
-        setVideos(videoArray.splice(0, videoArray.length - 1));
-        break;
-      }
-    }
+    setAnimator((prevAnimator) =>
+      prevAnimator.map((anim, i) => {
+        switch (i) {
+          case 0:
+            return {
+              ...anim,
+              fromValue: anim.toValue,
+              fromSign: `${anim.toSign}`,
+              toValue: anim.toValue === 0 ? 20 : anim.toValue === 20 ? 40 : 0,
+              toSign: ``,
+            };
+
+          case 1:
+            return {
+              ...anim,
+              fromValue: anim.toValue,
+              fromSign: `${anim.toSign}`,
+              toValue: anim.toValue === 0 ? 20 : anim.toSign === "-" ? 0 : 20,
+              toSign: anim.toValue === 0 ? "" : anim.toSign === "-" ? "" : "-",
+            };
+
+          case 2:
+            return {
+              ...anim,
+              fromValue: anim.toValue,
+              fromSign: `${anim.toSign}`,
+              toValue: anim.toValue === 20 ? 0 : anim.toValue === 0 ? 40 : 20,
+              toSign: anim.toValue === 0 ? "-" : anim.toSign === "-" ? "-" : "",
+            };
+        }
+      })
+    );
+
+    setIterator(
+      videoIterator - 1 < 0 ? animator.length - 1 : videoIterator - 1
+    );
   }
 
   return (
